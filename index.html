@@ -1153,21 +1153,14 @@
     }
     async function refreshSupabaseSession() {
       if (!supabaseSession?.refresh_token) throw new Error("Нет данных для обновления сессии");
-      const response = await fetch(`${supabaseApiUrl()}/auth/v1/token?grant_type=refresh_token`, {
-        method: "POST",
-        headers: { apikey: SUPABASE_CONFIG.publishableKey, "Content-Type": "application/json" },
-        body: JSON.stringify({ refresh_token: supabaseSession.refresh_token })
-      });
-      const authSession = await response.json();
-      if (!response.ok) throw new Error(authSession.error_description || "Не удалось обновить сессию");
+      const { session: authSession } = await callStaffCodeAuth({ action: "refresh", refreshToken: supabaseSession.refresh_token });
       saveSupabaseSession(authSession);
       return authSession;
     }
     async function restoreSharedSession() {
       if (!supabaseSession?.access_token) return;
       try {
-        const response = await fetch(`${supabaseApiUrl()}/auth/v1/user`, { headers: supabaseHeaders() });
-        const authUser = response.ok ? await response.json() : (await refreshSupabaseSession()).user;
+        const authUser = (await refreshSupabaseSession()).user;
         await loadSharedState(authUser);
         render();
       } catch (_) {
@@ -1879,16 +1872,11 @@
       const errorBox = document.getElementById("sharedLoginError");
       errorBox.innerHTML = "";
       try {
-        const response = await fetch(`${supabaseApiUrl()}/auth/v1/token?grant_type=password`, {
-          method: "POST",
-          headers: { apikey: SUPABASE_CONFIG.publishableKey, "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: document.getElementById("sharedEmail").value.trim(),
-            password: document.getElementById("sharedPassword").value
-          })
+        const { session: authSession } = await callStaffCodeAuth({
+          action: "admin-login",
+          email: document.getElementById("sharedEmail").value.trim(),
+          password: document.getElementById("sharedPassword").value
         });
-        const authSession = await response.json();
-        if (!response.ok) throw new Error(authSession.error_description || "Неверный email или пароль");
         await activateSharedSession(authSession);
       } catch (error) {
         saveSupabaseSession(null);
@@ -1915,9 +1903,6 @@
       document.getElementById("loginCode").focus();
     }
     async function logout() {
-      if (sharedMode && supabaseSession?.access_token) {
-        fetch(`${supabaseApiUrl()}/auth/v1/logout`, { method: "POST", headers: supabaseHeaders() }).catch(() => {});
-      }
       saveSupabaseSession(null);
       sharedMode = false;
       session = null;
