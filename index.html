@@ -1,0 +1,2595 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>СТИЛ 5С - Аудиты</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    :root {
+      --ink: #15251f;
+      --muted: #6d7b75;
+      --line: #dfe7e2;
+      --paper: #ffffff;
+      --bg: #f4f7f3;
+      --mint: #dff3e7;
+      --green: #176b49;
+      --green-dark: #0d4b34;
+      --orange: #e9792b;
+      --orange-soft: #fff0e1;
+      --red: #c84b46;
+      --red-soft: #ffedeb;
+      --blue: #2b6696;
+      --blue-soft: #eaf4ff;
+      --gold: #a16b00;
+      --gold-soft: #fff3c9;
+      --shadow: 0 16px 46px rgba(32, 57, 47, .08);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; }
+    button:disabled { cursor: not-allowed; opacity: .52; transform: none !important; }
+    .hidden { display: none !important; }
+
+    .login-page {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(320px, 1.06fr) minmax(420px, .94fr);
+      background: #f7faf6;
+    }
+    .login-hero {
+      position: relative;
+      overflow: hidden;
+      padding: 44px 6vw;
+      background:
+        radial-gradient(circle at 83% 17%, rgba(245, 175, 82, .34), transparent 27%),
+        radial-gradient(circle at 15% 82%, rgba(87, 163, 119, .28), transparent 34%),
+        linear-gradient(145deg, #0d4432, #176b49 56%, #1d7c57);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .login-hero::after {
+      content: "";
+      position: absolute;
+      right: -110px;
+      bottom: -110px;
+      width: 400px;
+      height: 400px;
+      border: 1px solid rgba(255,255,255,.13);
+      border-radius: 50%;
+      box-shadow: 0 0 0 55px rgba(255,255,255,.035), 0 0 0 110px rgba(255,255,255,.025);
+    }
+    .brand {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      font-weight: 800;
+      letter-spacing: .06em;
+      font-size: 14px;
+    }
+    .brand-mark {
+      display: grid;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      border-radius: 15px;
+      background: rgba(255,255,255,.14);
+      border: 1px solid rgba(255,255,255,.18);
+      backdrop-filter: blur(10px);
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+    .hero-copy { position: relative; z-index: 1; max-width: 610px; padding: 46px 0; }
+    .hero-kicker {
+      display: inline-flex;
+      gap: 7px;
+      align-items: center;
+      padding: 7px 11px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 999px;
+      background: rgba(255,255,255,.11);
+      font-size: 12px;
+      font-weight: 750;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    .hero-copy h1 {
+      max-width: 580px;
+      margin: 20px 0 14px;
+      font-size: clamp(42px, 6vw, 74px);
+      letter-spacing: -.075em;
+      line-height: .98;
+    }
+    .hero-copy p {
+      max-width: 560px;
+      margin: 0;
+      color: rgba(255,255,255,.78);
+      font-size: 18px;
+      line-height: 1.65;
+    }
+    .hero-features {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .hero-feature {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      color: rgba(255,255,255,.84);
+      font-size: 13px;
+    }
+    .hero-feature span {
+      display: grid;
+      width: 24px;
+      height: 24px;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba(255,255,255,.15);
+      color: white;
+    }
+    .login-side {
+      display: grid;
+      place-items: center;
+      padding: 42px;
+    }
+    .login-card {
+      width: min(100%, 460px);
+      padding: 32px;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: rgba(255,255,255,.92);
+      box-shadow: var(--shadow);
+    }
+    .login-card h2 { margin: 0 0 8px; font-size: 28px; letter-spacing: -.04em; }
+    .login-card p { margin: 0 0 24px; color: var(--muted); font-size: 14px; line-height: 1.55; }
+    .field-label { display: block; margin-bottom: 7px; color: #496058; font-size: 12px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+    .code-input {
+      width: 100%;
+      height: 58px;
+      padding: 0 16px;
+      border: 1px solid #cddad3;
+      border-radius: 14px;
+      outline: none;
+      color: var(--ink);
+      background: white;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-align: center;
+      text-transform: uppercase;
+      transition: .2s ease;
+    }
+    .code-input:focus { border-color: var(--green); box-shadow: 0 0 0 4px rgba(23,107,73,.12); }
+    .shared-input {
+      width: 100%;
+      height: 48px;
+      margin-bottom: 11px;
+      padding: 0 14px;
+      border: 1px solid #cddad3;
+      border-radius: 12px;
+      outline: none;
+      color: var(--ink);
+      background: white;
+      font-size: 15px;
+    }
+    .shared-input:focus { border-color: var(--green); box-shadow: 0 0 0 4px rgba(23,107,73,.1); }
+    .shared-note { margin: 12px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .service-login { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); }
+    .service-login summary { cursor: pointer; color: var(--muted); font-size: 12px; font-weight: 750; }
+    .service-login form { margin-top: 13px; }
+    .login-separator { display: flex; gap: 10px; align-items: center; margin: 22px 0; color: var(--muted); font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    .login-separator::before, .login-separator::after { content: ""; height: 1px; flex: 1; background: var(--line); }
+    .primary-btn, .secondary-btn, .ghost-btn, .danger-btn {
+      display: inline-flex;
+      min-height: 42px;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-radius: 12px;
+      padding: 0 16px;
+      border: 1px solid transparent;
+      font-weight: 750;
+      font-size: 14px;
+      transition: .18s ease;
+    }
+    .primary-btn { background: var(--green); color: white; }
+    .primary-btn:hover { background: var(--green-dark); transform: translateY(-1px); }
+    .secondary-btn { border-color: #cfe1d8; background: var(--mint); color: var(--green-dark); }
+    .secondary-btn:hover { border-color: #add1bd; background: #d2edde; }
+    .ghost-btn { border-color: var(--line); background: white; color: var(--ink); }
+    .ghost-btn:hover { border-color: #bfd0c7; background: #f8fbf9; }
+    .danger-btn { border-color: #f4c4c0; background: var(--red-soft); color: #a33b37; }
+    .danger-btn:hover { border-color: #e9a7a2; }
+    .full-btn { width: 100%; margin-top: 14px; }
+    .login-error {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: var(--red-soft);
+      color: #a33b37;
+      font-size: 13px;
+      font-weight: 650;
+    }
+    .demo-box { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); }
+    .demo-title { margin-bottom: 10px; color: var(--muted); font-size: 12px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+    .demo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .demo-code {
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: white;
+      color: var(--ink);
+      font-size: 12px;
+      text-align: left;
+    }
+    .demo-code:hover { border-color: #b3cdc0; background: #f8fcf9; }
+    .demo-code b { display: block; margin-bottom: 3px; color: var(--green); font-size: 13px; letter-spacing: .04em; }
+
+    .app-shell { min-height: 100vh; display: grid; grid-template-columns: 248px 1fr; }
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 22px 16px 16px;
+      background: var(--green-dark);
+      color: white;
+    }
+    .sidebar .brand { padding: 2px 7px 26px; }
+    .nav { display: grid; gap: 5px; }
+    .nav-btn {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      gap: 11px;
+      padding: 11px 12px;
+      border: 0;
+      border-radius: 11px;
+      background: transparent;
+      color: rgba(255,255,255,.65);
+      font-size: 14px;
+      text-align: left;
+      transition: .16s ease;
+    }
+    .nav-btn svg { width: 18px; height: 18px; }
+    .nav-btn:hover, .nav-btn.active { background: rgba(255,255,255,.12); color: white; }
+    .nav-btn.active { font-weight: 760; }
+    .sidebar-bottom { margin-top: auto; }
+    .profile-mini {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 12px 7px;
+      border-top: 1px solid rgba(255,255,255,.13);
+    }
+    .avatar {
+      display: grid;
+      flex: 0 0 auto;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      border-radius: 13px;
+      background: #f3c977;
+      color: #5d4109;
+      font-size: 13px;
+      font-weight: 850;
+    }
+    .profile-mini b { display: block; max-width: 145px; overflow: hidden; color: white; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+    .profile-mini span { display: block; margin-top: 3px; color: rgba(255,255,255,.56); font-size: 11px; }
+    .logout-btn {
+      display: flex;
+      width: 100%;
+      gap: 9px;
+      align-items: center;
+      padding: 10px 9px;
+      border: 0;
+      border-radius: 10px;
+      background: transparent;
+      color: rgba(255,255,255,.58);
+      font-size: 13px;
+    }
+    .logout-btn:hover { background: rgba(255,255,255,.09); color: white; }
+    .logout-btn svg { width: 17px; height: 17px; }
+
+    .main { min-width: 0; padding: 28px 34px 42px; }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: center;
+      margin-bottom: 26px;
+    }
+    .topbar h1 { margin: 0; font-size: 30px; letter-spacing: -.055em; }
+    .topbar p { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
+    .top-actions { display: flex; gap: 9px; }
+    .icon-btn {
+      display: grid;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: white;
+      color: var(--ink);
+    }
+    .icon-btn svg { width: 18px; height: 18px; }
+    .content { max-width: 1420px; margin: 0 auto; }
+    .hero-card {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(210px, .4fr);
+      overflow: hidden;
+      margin-bottom: 18px;
+      padding: 25px 26px;
+      border-radius: var(--radius);
+      background:
+        radial-gradient(circle at 88% 20%, rgba(255,220,156,.65), transparent 23%),
+        linear-gradient(125deg, #e2f4e6 0%, #eef8ed 58%, #fff4da 100%);
+      border: 1px solid #d8e7da;
+    }
+    .hero-card h2 { margin: 8px 0 8px; font-size: 26px; letter-spacing: -.045em; }
+    .hero-card p { max-width: 680px; margin: 0; color: #587167; font-size: 14px; line-height: 1.6; }
+    .hero-badge {
+      display: inline-flex;
+      gap: 7px;
+      align-items: center;
+      width: fit-content;
+      padding: 6px 9px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.68);
+      color: var(--green-dark);
+      font-size: 11px;
+      font-weight: 850;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .hero-score { display: grid; place-content: center; text-align: right; }
+    .hero-score strong { display: block; font-size: 48px; letter-spacing: -.09em; line-height: 1; }
+    .hero-score span { display: block; margin-top: 5px; color: #678076; font-size: 12px; font-weight: 750; text-transform: uppercase; letter-spacing: .08em; }
+
+    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 13px; margin-bottom: 18px; }
+    .metric, .panel {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--paper);
+      box-shadow: 0 5px 22px rgba(37,66,54,.035);
+    }
+    .metric { padding: 16px; }
+    .metric-head { display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: 12px; font-weight: 750; }
+    .metric-icon { display: grid; width: 32px; height: 32px; place-items: center; border-radius: 10px; background: var(--mint); color: var(--green); }
+    .metric-icon.warn { background: var(--orange-soft); color: var(--orange); }
+    .metric-icon.blue { background: var(--blue-soft); color: var(--blue); }
+    .metric-icon.gold { background: var(--gold-soft); color: var(--gold); }
+    .metric-icon svg { width: 16px; height: 16px; }
+    .metric-value { margin-top: 8px; font-size: 29px; font-weight: 850; letter-spacing: -.06em; }
+    .metric-note { margin-top: 4px; color: var(--muted); font-size: 12px; }
+    .grid-2 { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(270px, .65fr); gap: 18px; }
+    .panel { padding: 18px; }
+    .panel + .panel { margin-top: 14px; }
+    .panel-head { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 14px; }
+    .panel-head h3 { margin: 0; font-size: 17px; letter-spacing: -.025em; }
+    .panel-head p { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
+    .small-link { border: 0; background: transparent; color: var(--green); font-size: 13px; font-weight: 750; }
+
+    .task-list { display: grid; gap: 10px; }
+    .task-card {
+      display: grid;
+      grid-template-columns: 43px minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: white;
+      transition: .18s ease;
+    }
+    .task-card:hover { border-color: #bdd5c9; box-shadow: 0 8px 20px rgba(31,93,67,.07); transform: translateY(-1px); }
+    .task-symbol { display: grid; width: 43px; height: 43px; place-items: center; border-radius: 12px; background: var(--mint); color: var(--green); }
+    .task-symbol svg { width: 20px; height: 20px; }
+    .task-symbol.orange { background: var(--orange-soft); color: var(--orange); }
+    .task-symbol.blue { background: var(--blue-soft); color: var(--blue); }
+    .task-symbol.red { background: var(--red-soft); color: var(--red); }
+    .task-title { overflow: hidden; font-size: 14px; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
+    .task-sub { display: flex; gap: 7px; align-items: center; margin-top: 5px; color: var(--muted); font-size: 12px; }
+    .dot { width: 4px; height: 4px; border-radius: 50%; background: #a9b8b1; }
+    .task-action { min-width: 108px; }
+    .status {
+      display: inline-flex;
+      gap: 5px;
+      align-items: center;
+      width: fit-content;
+      padding: 5px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .status.todo { background: var(--blue-soft); color: var(--blue); }
+    .status.draft { background: var(--orange-soft); color: #ad591e; }
+    .status.review { background: var(--gold-soft); color: #946200; }
+    .status.accepted { background: var(--mint); color: var(--green); }
+    .status.returned { background: var(--red-soft); color: var(--red); }
+    .status.actioned { background: var(--blue-soft); color: var(--blue); }
+    .bitrix-note { margin-top: 7px; color: var(--blue); font-size: 12px; font-weight: 750; }
+    .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .filter-chip {
+      padding: 7px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: white;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+    }
+    .filter-chip.active { border-color: #b9d8c8; background: var(--mint); color: var(--green-dark); }
+    .progress-track { height: 8px; overflow: hidden; border-radius: 99px; background: #e7eee9; }
+    .progress-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, #1b754f, #55a975); }
+    .progress-caption { display: flex; justify-content: space-between; margin-top: 8px; color: var(--muted); font-size: 12px; }
+    .legend { display: grid; gap: 11px; margin-top: 16px; }
+    .legend-row { display: grid; grid-template-columns: 10px 1fr auto; gap: 8px; align-items: center; font-size: 12px; }
+    .legend-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--green); }
+    .legend-dot.orange { background: var(--orange); }
+    .legend-dot.blue { background: var(--blue); }
+    .legend-row span { color: var(--muted); }
+
+    .page-title-row { display: flex; justify-content: space-between; gap: 14px; align-items: flex-end; margin-bottom: 16px; }
+    .page-title-row h2 { margin: 0; font-size: 22px; letter-spacing: -.04em; }
+    .page-title-row p { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+    .search {
+      width: 260px;
+      height: 40px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      outline: none;
+      background: white;
+      color: var(--ink);
+      font-size: 13px;
+    }
+    .search:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(23,107,73,.1); }
+
+    .review-card {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) auto;
+      gap: 16px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: white;
+    }
+    .review-card + .review-card { margin-top: 9px; }
+    .review-card h4 { margin: 0; font-size: 14px; }
+    .review-meta { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 7px; color: var(--muted); font-size: 12px; }
+    .review-actions { display: flex; gap: 7px; align-items: center; }
+
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { padding: 10px 9px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 11px; letter-spacing: .055em; text-align: left; text-transform: uppercase; }
+    td { padding: 11px 9px; border-bottom: 1px solid #edf1ee; vertical-align: middle; }
+    tr:last-child td { border-bottom: 0; }
+    .person { display: flex; gap: 9px; align-items: center; }
+    .person .avatar { width: 34px; height: 34px; border-radius: 11px; font-size: 11px; }
+    .person b { display: block; font-size: 13px; }
+    .person span { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; }
+    .role-toggle {
+      padding: 6px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: white;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .role-toggle.on { border-color: #ead08a; background: var(--gold-soft); color: var(--gold); }
+    .room-edit-btn { white-space: nowrap; padding: 7px 11px; font-size: 12px; }
+    .room-editor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 16px 0; }
+    .room-editor-grid .full { grid-column: 1 / -1; }
+    .room-editor-grid label { display: block; color: var(--muted); font-size: 12px; font-weight: 750; margin-bottom: 6px; }
+    .room-editor-grid input, .room-editor-grid select { width: 100%; border: 1px solid var(--line); border-radius: 10px; padding: 10px 11px; background: white; color: var(--ink); }
+    .check-list { max-height: 220px; overflow: auto; border: 1px solid var(--line); border-radius: 10px; padding: 6px; background: #fbfcfb; }
+    .check-item { display: flex; align-items: center; gap: 9px; padding: 7px 6px; border-radius: 7px; font-size: 13px; cursor: pointer; }
+    .check-item:hover { background: #f0f6f3; }
+    .check-item input { width: auto; }
+
+    .audit-layout { display: grid; grid-template-columns: minmax(0, 1fr) 270px; gap: 18px; }
+    .quick-audit {
+      max-width: 760px;
+      margin: 42px auto;
+      padding: 26px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: white;
+      box-shadow: 0 10px 30px rgba(37,66,54,.05);
+    }
+    .quick-audit h2 { margin: 8px 0 6px; font-size: 24px; letter-spacing: -.04em; }
+    .quick-audit p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
+    .quick-audit-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 22px; }
+    .quick-audit-actions button { min-height: 62px; font-size: 16px; }
+    .audit-head {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: white;
+    }
+    .audit-head-top { display: flex; justify-content: space-between; gap: 12px; align-items: start; }
+    .audit-head h2 { margin: 6px 0 5px; font-size: 22px; letter-spacing: -.045em; }
+    .audit-head p { margin: 0; color: var(--muted); font-size: 13px; }
+    .audit-score {
+      display: grid;
+      width: 70px;
+      height: 70px;
+      flex: 0 0 auto;
+      place-content: center;
+      border-radius: 20px;
+      background: var(--mint);
+      color: var(--green-dark);
+      text-align: center;
+    }
+    .audit-score b { font-size: 23px; letter-spacing: -.06em; }
+    .audit-score span { display: block; margin-top: 2px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+    .step-strip { display: grid; grid-template-columns: repeat(5,1fr); gap: 7px; margin: 14px 0; }
+    .step-tab {
+      padding: 10px 7px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: white;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .step-tab.active { border-color: #b4d7c3; background: var(--mint); color: var(--green-dark); }
+    .step-tab.done::after { content: "  ✓"; color: var(--green); }
+    .question {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: white;
+    }
+    .question + .question { margin-top: 10px; }
+    .question-title { display: flex; gap: 9px; font-size: 14px; line-height: 1.5; }
+    .question-num {
+      display: grid;
+      width: 23px;
+      height: 23px;
+      flex: 0 0 auto;
+      place-items: center;
+      border-radius: 8px;
+      background: #eef4f0;
+      color: var(--green-dark);
+      font-size: 11px;
+      font-weight: 850;
+    }
+    .score-buttons { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 12px; }
+    .score-choice {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: white;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+    }
+    .score-choice:hover { border-color: #bdd2c7; }
+    .score-choice.sel-0 { border-color: #e9b0ac; background: var(--red-soft); color: #a83d38; }
+    .score-choice.sel-1 { border-color: #f0c79f; background: var(--orange-soft); color: #a8571f; }
+    .score-choice.sel-2 { border-color: #afd4c0; background: var(--mint); color: var(--green); }
+    .note-box {
+      width: 100%;
+      min-height: 72px;
+      margin-top: 10px;
+      padding: 10px 11px;
+      resize: vertical;
+      border: 1px solid #efc1be;
+      border-radius: 10px;
+      outline: none;
+      background: #fffafa;
+      color: var(--ink);
+      font-size: 13px;
+    }
+    .note-box:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(200,75,70,.09); }
+    .question-hint { margin-top: 7px; color: var(--red); font-size: 11px; font-weight: 700; }
+    .audit-footer { display: flex; justify-content: space-between; gap: 9px; margin-top: 13px; }
+    .side-note { padding: 15px; border: 1px solid var(--line); border-radius: 15px; background: white; }
+    .side-note + .side-note { margin-top: 12px; }
+    .side-note h4 { margin: 0 0 7px; font-size: 14px; }
+    .side-note p, .side-note li { color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .side-note ul { margin: 8px 0 0; padding-left: 18px; }
+    .file-input { max-width: 100%; color: var(--muted); font-size: 11px; }
+    .return-note { margin-top: 8px; padding: 9px; border-radius: 9px; background: var(--red-soft); color: #9c3b37; font-size: 12px; line-height: 1.45; }
+
+    .modal-backdrop {
+      position: fixed;
+      z-index: 20;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background: rgba(13,37,28,.46);
+      backdrop-filter: blur(3px);
+    }
+    .modal {
+      width: min(100%, 500px);
+      padding: 20px;
+      border-radius: 18px;
+      background: white;
+      box-shadow: 0 24px 80px rgba(0,0,0,.2);
+    }
+    .modal h3 { margin: 0 0 7px; font-size: 19px; letter-spacing: -.03em; }
+    .modal p { margin: 0 0 13px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .modal textarea {
+      width: 100%;
+      min-height: 96px;
+      padding: 10px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      outline: none;
+      font-size: 13px;
+    }
+    .modal textarea:focus { border-color: var(--green); }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 13px; }
+    .issued-code { margin: 14px 0; padding: 14px; border: 1px dashed #add1bd; border-radius: 12px; background: var(--mint); color: var(--green-dark); font-size: 21px; font-weight: 850; letter-spacing: .11em; text-align: center; }
+    .access-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+    .access-actions button { min-height: 34px; padding: 0 10px; font-size: 12px; }
+    .toast {
+      position: fixed;
+      z-index: 30;
+      right: 18px;
+      bottom: 18px;
+      max-width: 380px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: var(--green-dark);
+      color: white;
+      box-shadow: 0 12px 40px rgba(0,0,0,.18);
+      font-size: 13px;
+      font-weight: 700;
+      animation: toast-in .22s ease both;
+    }
+    @keyframes toast-in { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: none; } }
+    .mobile-nav { display: none; }
+    .empty { padding: 28px 16px; color: var(--muted); font-size: 13px; text-align: center; }
+
+    @media (max-width: 1040px) {
+      .login-page { grid-template-columns: 1fr; }
+      .login-hero { min-height: 360px; }
+      .login-side { padding: 32px 18px; }
+      .app-shell { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .main { padding: 20px 18px 82px; }
+      .mobile-nav {
+        position: fixed;
+        z-index: 15;
+        right: 10px;
+        bottom: 10px;
+        left: 10px;
+        display: flex;
+        justify-content: space-around;
+        padding: 7px;
+        border: 1px solid var(--line);
+        border-radius: 17px;
+        background: rgba(255,255,255,.92);
+        box-shadow: 0 12px 38px rgba(35,62,51,.16);
+        backdrop-filter: blur(12px);
+      }
+      .mobile-nav .nav-btn { width: auto; flex-direction: column; gap: 3px; padding: 7px 10px; color: var(--muted); font-size: 10px; }
+      .mobile-nav .nav-btn.active { background: var(--mint); color: var(--green-dark); }
+      .mobile-nav .nav-btn svg { width: 16px; height: 16px; }
+    }
+    @media (max-width: 760px) {
+      .login-hero { min-height: 310px; padding: 24px 22px; }
+      .hero-copy { padding: 30px 0 10px; }
+      .hero-copy h1 { font-size: 45px; }
+      .hero-copy p { font-size: 15px; }
+      .hero-features { display: none; }
+      .login-card { padding: 23px; }
+      .topbar h1 { font-size: 25px; }
+      .top-actions .ghost-btn { display: none; }
+      .hero-card { grid-template-columns: 1fr; padding: 19px; }
+      .hero-score { display: none; }
+      .metrics { grid-template-columns: 1fr 1fr; gap: 9px; }
+      .metric { padding: 13px; }
+      .metric-value { font-size: 25px; }
+      .grid-2, .audit-layout { grid-template-columns: 1fr; }
+      .quick-audit-actions { grid-template-columns: 1fr; }
+      .audit-layout aside { order: -1; }
+      .task-card { grid-template-columns: 40px minmax(0,1fr); }
+      .task-action { grid-column: 2; }
+      .task-action .ghost-btn, .task-action .primary-btn { min-height: 35px; padding: 0 12px; }
+      .page-title-row { display: block; }
+      .search { width: 100%; margin-top: 12px; }
+      .review-card { grid-template-columns: 1fr; }
+      .step-strip { gap: 4px; }
+      .step-tab { padding: 9px 3px; font-size: 11px; }
+      .score-choice { flex: 1; justify-content: center; padding: 9px 6px; }
+      .audit-footer { flex-wrap: wrap; }
+      .audit-footer button { flex: 1; }
+      table { min-width: 680px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script src="real-rooms.js"></script>
+  <script src="supabase-config.js"></script>
+  <script>
+    const S5 = [
+      {
+        key: "sort",
+        title: "1С · Сортировка",
+        short: "1С",
+        description: "Убираем лишнее и оставляем только необходимое.",
+        questions: [
+          "На рабочем месте отсутствуют ненужные, неисправные предметы.",
+          "На оборудовании, столах и шкафах отсутствуют посторонние предметы.",
+          "Определена зона красных ярлыков, сотрудники знают правила работы с ней.",
+          "Доступ к материалам, документации и рабочему оборудованию не затруднён.",
+          "Отсутствует неактуальная документация и устаревшая информация."
+        ]
+      },
+      {
+        key: "order",
+        title: "2С · Соблюдение порядка",
+        short: "2С",
+        description: "Проверяем места хранения, разметку и свободные проходы.",
+        questions: [
+          "Все используемые предметы имеют постоянное место хранения.",
+          "Места хранения промаркированы, отсутствие предмета можно определить визуально.",
+          "Расположение предметов удобно для работы и соответствует схеме.",
+          "Проходы, рабочие зоны и доступ к средствам пожаротушения свободны.",
+          "Маршруты, зоны хранения и опасные участки обозначены."
+        ]
+      },
+      {
+        key: "clean",
+        title: "3С · Содержание в чистоте",
+        short: "3С",
+        description: "Осматриваем чистоту рабочих зон, оборудования и пола.",
+        questions: [
+          "Средства для уборки имеются в наличии и доступны.",
+          "Оборудование, мебель и шкафчики находятся в чистоте.",
+          "Рабочие зоны, включая труднодоступные места, находятся в чистоте.",
+          "Чистота поддерживается во время выполнения работ.",
+          "Напольное покрытие и разметка находятся в чистоте."
+        ]
+      },
+      {
+        key: "standard",
+        title: "4С · Стандартизация",
+        short: "4С",
+        description: "Сверяем стандарты, схемы, графики и инструкции.",
+        questions: [
+          "На рабочем месте размещён график уборки, он соблюдается.",
+          "Объекты рабочего места соответствуют утверждённой схеме.",
+          "Стандарт рабочего места актуален и соблюдается.",
+          "Документы, папки и зоны хранения обозначены.",
+          "Инструкции по охране труда и пожарной безопасности размещены и актуальны."
+        ]
+      },
+      {
+        key: "improve",
+        title: "5С · Совершенствование",
+        short: "5С",
+        description: "Фиксируем улучшения и работу с прошлыми замечаниями.",
+        questions: [
+          "Информация о системе 5С и график аудита актуальны.",
+          "Сотрудники предлагают и внедряют улучшения рабочих мест.",
+          "Организован регулярный контроль поддержания системы 5С.",
+          "По предыдущему аудиту разработан и выполняется план мероприятий.",
+          "Размещены примеры улучшений «было — стало»."
+        ]
+      }
+    ];
+
+    const icons = {
+      shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s7-3.4 7-10V5l-7-3-7 3v6c0 6.6 7 10 7 10Z"/><path d="m9 12 2 2 4-4"/></svg>',
+      home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></svg>',
+      clipboard: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 5H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3"/><rect width="6" height="4" x="9" y="3" rx="1"/><path d="m9 14 2 2 4-4"/></svg>',
+      review: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 3h5v5"/><path d="m21 3-7 7"/><path d="M13 5H6a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-7"/><path d="m8 14 2 2 5-5"/></svg>',
+      chart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19V5"/><path d="M4 19h16"/><path d="m7 15 4-4 3 2 5-6"/></svg>',
+      users: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+      settings: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.8 1.8 0 0 0 .36 1.98l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.8 1.8 0 0 0 15 19.4a1.8 1.8 0 0 0-1 .6 1.8 1.8 0 0 0-.42 1.18V21a2 2 0 1 1-4 0v-.09A1.8 1.8 0 0 0 8.4 19.4a1.8 1.8 0 0 0-1.98.36l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.8 1.8 0 0 0 4.6 15a1.8 1.8 0 0 0-.6-1 1.8 1.8 0 0 0-1.18-.42H3a2 2 0 1 1 0-4h.09A1.8 1.8 0 0 0 4.6 8.4a1.8 1.8 0 0 0-.36-1.98l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.8 1.8 0 0 0 9 4.6a1.8 1.8 0 0 0 1-.6 1.8 1.8 0 0 0 .42-1.18V3a2 2 0 1 1 4 0v.09A1.8 1.8 0 0 0 15.6 4.6a1.8 1.8 0 0 0 1.98-.36l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.8 1.8 0 0 0 19.4 9c.14.37.36.71.65 1 .31.29.73.44 1.15.42H21a2 2 0 1 1 0 4h-.09A1.8 1.8 0 0 0 19.4 15Z"/></svg>',
+      logout: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>',
+      bell: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>',
+      building: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18"/><path d="M6 21V5l6-3 6 3v16"/><path d="M9 9h.01"/><path d="M15 9h.01"/><path d="M9 13h.01"/><path d="M15 13h.01"/><path d="M10 21v-4h4v4"/></svg>',
+      factory: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21V10l6 3V9l6 4V5h4l2 16Z"/><path d="M3 21h18"/><path d="M7 17h.01"/><path d="M11 17h.01"/><path d="M15 17h.01"/></svg>',
+      truck: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 17h4V5H2v12h3"/><path d="M14 9h4l4 4v4h-3"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="16.5" cy="17.5" r="2.5"/></svg>',
+      clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+      flag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 22V4"/><path d="M5 5c5-4 9 4 14 0v10c-5 4-9-4-14 0"/></svg>',
+      download: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>',
+      plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14"/><path d="M5 12h14"/></svg>',
+      arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 18 6-6-6-6"/></svg>',
+      back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m15 18-6-6 6-6"/></svg>',
+      check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 4 4L19 6"/></svg>',
+      x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
+      refresh: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 5v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></svg>'
+    };
+
+    const DATASET_VERSION = "2026-real-rooms-v4";
+    const SCHEDULE_NOW = new Date();
+    function pad2(value) { return String(value).padStart(2, "0"); }
+    function monthPeriodKey(date = SCHEDULE_NOW) {
+      return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}`;
+    }
+    function weekPeriodKey(date = SCHEDULE_NOW) {
+      const thursday = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      const day = thursday.getDay() || 7;
+      thursday.setDate(thursday.getDate() + 4 - day);
+      const firstDay = new Date(thursday.getFullYear(), 0, 1);
+      const week = Math.ceil((((thursday - firstDay) / 86400000) + 1) / 7);
+      return `${thursday.getFullYear()}-W${pad2(week)}`;
+    }
+    function recentPeriodKeys(periodicity, count = 3) {
+      return Array.from({ length: count }, (_, index) => {
+        const date = new Date(SCHEDULE_NOW.getFullYear(), SCHEDULE_NOW.getMonth(), SCHEDULE_NOW.getDate());
+        if (isWeekly(periodicity)) date.setDate(date.getDate() - index * 7);
+        else date.setMonth(date.getMonth() - index);
+        return isWeekly(periodicity) ? weekPeriodKey(date) : monthPeriodKey(date);
+      });
+    }
+    function formatShortDate(date) {
+      return new Intl.DateTimeFormat("ru-RU", { day: "2-digit", month: "2-digit", year: "numeric" }).format(date);
+    }
+    function isWeekly(periodicity) {
+      return String(periodicity || "").toLowerCase().includes("недел");
+    }
+    function periodicityLabel(periodicity) {
+      if (!periodicity) return "Не указана";
+      return isWeekly(periodicity) ? "Еженедельно" : "Ежемесячно";
+    }
+    function scheduleFor(periodicity) {
+      if (isWeekly(periodicity)) {
+        const end = new Date(SCHEDULE_NOW.getFullYear(), SCHEDULE_NOW.getMonth(), SCHEDULE_NOW.getDate());
+        end.setDate(end.getDate() + (7 - (end.getDay() || 7)));
+        return { periodKey: weekPeriodKey(), due: `до ${formatShortDate(end)}` };
+      }
+      const end = new Date(SCHEDULE_NOW.getFullYear(), SCHEDULE_NOW.getMonth() + 1, 0);
+      return { periodKey: monthPeriodKey(), due: `до ${formatShortDate(end)}` };
+    }
+    function roomAuditorIds(room) {
+      return [...new Set([...(room.auditorIds || []), ...(room.auditorId ? [room.auditorId] : [])].filter(Boolean))];
+    }
+    function buildInitialRooms() {
+      return structuredClone(REAL_ROOMS).map(room => {
+        room.auditorIds = roomAuditorIds(room);
+        room.auditorId = room.auditorIds[0] || "";
+        room.issues = buildRoomIssues(room);
+        return room;
+      });
+    }
+    const INITIAL_ROOMS = buildInitialRooms();
+    const seed = {
+      datasetVersion: DATASET_VERSION,
+      users: [
+        { id: "u1", bitrixId: "291", code: "A-125", name: "Бахмут Алексей Иванович", dept: "Прессовый участок", role: "auditor", rooms: "Пресса · операторская" },
+        { id: "u2", bitrixId: "196", code: "G-001", name: "Сапронов Дмитрий Игоревич", dept: "ПСК", role: "chief", rooms: "Проверяет только назначенные помещения" },
+        { id: "u3", bitrixId: "167", code: "G-002", name: "Баркалёва Юлия Владимировна", dept: "Департамент заместителя генерального директора", role: "chief", overseeAll: true, rooms: "Проверяет офисы и прочие помещения · видит все аудиты" },
+        { id: "u4", bitrixId: "288", code: "A-134", name: "Гареев Радик Фаридович", dept: "Заготовительный участок", role: "auditor", rooms: "Заготовительный участок" },
+        { id: "u5", bitrixId: "290", code: "A-136", name: "Хохлов Евгений Геннадьевич", dept: "Участок окраски", role: "auditor", rooms: "ОПУ · упаковка · окраска" },
+        { id: "u6", code: "A-2FLOOR", name: "Бычкова Анна Николаевна", dept: "Служба диспетчеризации", role: "auditor", rooms: "2 этаж" },
+        { id: "u7", bitrixId: "212", code: "A-14FLOOR", name: "Дмитриева Ирина Владимировна", dept: "Юридический отдел", role: "auditor", rooms: "1-й и 4-й этажи" },
+        { id: "u8", code: "A-TRANSPORT", name: "Бочкарёв Александр Викторович", dept: "Транспортный отдел", role: "auditor", rooms: "Транспорт" },
+        { id: "u9", code: "A-3FLOOR", name: "Приходько Александра Александровна", dept: "Офис", role: "auditor", rooms: "3 этаж" },
+        { id: "u10", bitrixId: "311", code: "A-WAREHOUSE", name: "Куров Сергей Михайлович", dept: "Склад", role: "auditor", rooms: "Складские помещения" },
+        { id: "u11", code: "A-PROFILE", name: "Карманов Алексей Алексеевич", dept: "Участок профилировки", role: "auditor", rooms: "Кровля · профилировка" },
+        { id: "u12", bitrixId: "205", code: "G-003", name: "Безусенко Алексей Гениевич", dept: "Совет директоров", role: "chief", overseeAll: true, rooms: "Контрольный обход · видит все помещения" },
+        { id: "admin", code: "ADM-5S", name: "Администратор системы", dept: "Управление аудитами 5С", role: "admin", rooms: "Все помещения" }
+      ],
+      tasks: buildInitialTasks(INITIAL_ROOMS),
+      rooms: structuredClone(INITIAL_ROOMS)
+    };
+
+    function buildTask(room, auditorId, auditKind = "route") {
+      const schedule = scheduleFor(room.periodicity);
+      return {
+        id: auditKind === "control" ? `control-${room.id}-${auditorId}` : `audit-${room.id}-${auditorId}`,
+        sourceRoomId: room.id,
+        auditorId,
+        auditKind,
+        responsibleBitrixId: room.responsibleBitrixId,
+        responsibleName: room.responsible,
+        ownerChief: room.chiefId,
+        room: room.name,
+        number: room.number || room.sourceObject,
+        type: room.checklist,
+        periodicity: periodicityLabel(room.periodicity),
+        periodKey: schedule.periodKey,
+        due: schedule.due,
+        status: "todo",
+        answers: {}
+      };
+    }
+    function buildInitialTasks(rooms) {
+      return rooms.flatMap(room => roomAuditorIds(room).map(auditorId => buildTask(room, auditorId)));
+    }
+    function ensureControlTask(room, chiefId) {
+      const id = `control-${room.id}-${chiefId}`;
+      let result = task(id);
+      if (!result) {
+        result = buildTask(room, chiefId, "control");
+        state.tasks.push(result);
+      }
+      return result;
+    }
+
+    function fullAnswers(score) {
+      const answers = {};
+      let remaining = 50 - score;
+      S5.forEach(section => section.questions.forEach((_, index) => {
+        const key = `${section.key}-${index}`;
+        const deduction = remaining > 0 ? Math.min(remaining, remaining > 2 ? 1 : remaining) : 0;
+        const value = 2 - deduction;
+        remaining -= deduction;
+        answers[key] = { score: value, note: value < 2 ? "Зафиксировано замечание для корректирующих действий." : "" };
+      }));
+      return answers;
+    }
+
+    const state = loadState();
+    const SHARED_PERIOD_KEY = monthPeriodKey();
+    const ACTIVE_PERIOD_KEYS = [...new Set([monthPeriodKey(), weekPeriodKey()])];
+    const PERIOD_MONTH = new Intl.DateTimeFormat("ru-RU", { month: "long" }).format(SCHEDULE_NOW);
+    const PERIOD_LABEL = new Intl.DateTimeFormat("ru-RU", { month: "long", year: "numeric" }).format(SCHEDULE_NOW).replace(/\s*г\.$/, "");
+    let session = null;
+    let supabaseSession = readSupabaseSession();
+    let sharedMode = false;
+    const sharedSaveTimers = new Map();
+    let view = "dashboard";
+    let auditTaskId = null;
+    let auditStep = 0;
+    let quickAuditPrompt = false;
+    let taskFilter = "all";
+    let roomSearch = "";
+    let returnPhotos = [];
+    let auditHistory = [];
+
+    function loadState() {
+      try {
+        const saved = JSON.parse(localStorage.getItem("steel5s_state"));
+        if (!saved || saved.datasetVersion !== DATASET_VERSION || !saved.users || !saved.tasks) return structuredClone(seed);
+        const fresh = structuredClone(seed);
+        saved.users.forEach(u => {
+          const source = fresh.users.find(x => x.id === u.id);
+          if (source?.bitrixId && !u.bitrixId) u.bitrixId = source.bitrixId;
+        });
+        saved.tasks.forEach(t => {
+          const source = fresh.tasks.find(x => x.id === t.id);
+          if (source?.responsibleBitrixId && !t.responsibleBitrixId) t.responsibleBitrixId = source.responsibleBitrixId;
+        });
+        return saved;
+      } catch (_) {
+        return structuredClone(seed);
+      }
+    }
+    function persist() {
+      try {
+        localStorage.setItem("steel5s_state", JSON.stringify(state));
+      } catch (_) {
+        toast("Фото сохранены только до закрытия страницы: не хватило места в браузере");
+      }
+    }
+    function readSupabaseSession() {
+      try { return JSON.parse(localStorage.getItem("steel5s_supabase_session")); }
+      catch (_) { return null; }
+    }
+    function saveSupabaseSession(value) {
+      supabaseSession = value;
+      if (value) localStorage.setItem("steel5s_supabase_session", JSON.stringify(value));
+      else localStorage.removeItem("steel5s_supabase_session");
+    }
+    function supabaseHeaders(extra = {}) {
+      return {
+        apikey: SUPABASE_CONFIG.publishableKey,
+        Authorization: `Bearer ${supabaseSession?.access_token || SUPABASE_CONFIG.publishableKey}`,
+        "Content-Type": "application/json",
+        ...extra
+      };
+    }
+    async function supabaseRequest(path, options = {}) {
+      const response = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/${path}`, {
+        method: options.method || "GET",
+        headers: supabaseHeaders(options.prefer ? { Prefer: options.prefer } : {}),
+        body: options.body === undefined ? undefined : JSON.stringify(options.body)
+      });
+      const text = await response.text();
+      const data = text ? JSON.parse(text) : null;
+      if (!response.ok) throw new Error(data?.message || data?.error_description || "Ошибка общей базы");
+      return data;
+    }
+    async function callStaffCodeAuth(body, token = SUPABASE_CONFIG.publishableKey) {
+      let response;
+      try {
+        response = await fetch(`${SUPABASE_CONFIG.url}/functions/v1/staff-code-auth`, {
+          method: "POST",
+          headers: {
+            apikey: SUPABASE_CONFIG.publishableKey,
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(body)
+        });
+      } catch (_) {
+        throw new Error("Функция входа staff-code-auth недоступна. Проверьте её публикацию в Supabase Edge Functions");
+      }
+      const text = await response.text();
+      let data;
+      try { data = text ? JSON.parse(text) : {}; }
+      catch (_) { data = {}; }
+      if (!response.ok || data.error) throw new Error(data.error || "Не удалось обработать персональный код");
+      return data;
+    }
+    async function callSharedFunction(name, body) {
+      let response;
+      try {
+        response = await fetch(`${SUPABASE_CONFIG.url}/functions/v1/${name}`, {
+          method: "POST",
+          headers: {
+            apikey: SUPABASE_CONFIG.publishableKey,
+            Authorization: `Bearer ${supabaseSession.access_token}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(body)
+        });
+      } catch (_) {
+        throw new Error(`Функция ${name} недоступна. Проверьте её публикацию в Supabase`);
+      }
+      const text = await response.text();
+      let data;
+      try { data = text ? JSON.parse(text) : {}; }
+      catch (_) { data = {}; }
+      if (!response.ok || data.ok === false) throw new Error(data.message || `Ошибка функции ${name}`);
+      return data;
+    }
+    function sharedUser(row) {
+      const local = seed.users.find(item => item.id === row.id) || {};
+      return {
+        id: row.id,
+        bitrixId: row.bitrix_id ? String(row.bitrix_id) : "",
+        code: local.code || "",
+        name: row.full_name,
+        dept: row.department || "",
+        role: row.role,
+        overseeAll: !!row.oversee_all,
+        rooms: local.rooms || ""
+      };
+    }
+    function sharedRoom(row, auditorIds) {
+      return {
+        id: row.id,
+        sourceRow: row.source_row,
+        sourceObject: row.source_object || "",
+        number: row.number || "",
+        name: row.name,
+        checklist: row.checklist,
+        periodicity: row.periodicity || "",
+        responsible: row.responsible_name || "",
+        responsibleBitrixId: row.responsible_bitrix_id ? String(row.responsible_bitrix_id) : "",
+        chiefId: row.chief_staff_id || "",
+        auditorIds,
+        auditorId: auditorIds[0] || "",
+        issues: Array.isArray(row.issues) ? row.issues : []
+      };
+    }
+    async function loadSharedState(authUser) {
+      const profileRows = await supabaseRequest(`profiles?user_id=eq.${encodeURIComponent(authUser.id)}&select=staff_id,is_active`);
+      const profile = profileRows?.[0];
+      if (!profile?.is_active) throw new Error("Учётная запись не привязана к сотруднику");
+      const [staffRows, roomRows, assignmentRows, auditRows, answerRows] = await Promise.all([
+        supabaseRequest("staff_members?select=id,bitrix_id,full_name,department,role,oversee_all,is_active&is_active=eq.true"),
+        supabaseRequest("rooms?select=id,source_row,source_object,number,name,checklist,periodicity,responsible_name,responsible_bitrix_id,chief_staff_id,issues&order=source_row.asc"),
+        supabaseRequest("room_auditors?select=room_id,auditor_staff_id,is_required"),
+        supabaseRequest("audits?select=id,client_ref,period_key,room_id,auditor_staff_id,audit_kind,status,score,return_comment,bitrix_task_id,accepted_at,submitted_at,created_at&order=created_at.desc"),
+        supabaseRequest("audit_answers?select=audit_id,question_key,score,note")
+      ]);
+      const assignments = new Map();
+      assignmentRows.forEach(row => {
+        // Ignore routes created by the old rule that assigned Sapronov to every room.
+        if (row.auditor_staff_id === "u2" && row.is_required) return;
+        if (!assignments.has(row.room_id)) assignments.set(row.room_id, []);
+        assignments.get(row.room_id).push(row.auditor_staff_id);
+      });
+      state.users = staffRows.map(sharedUser);
+      state.rooms = roomRows.map(row => sharedRoom(row, assignments.get(row.id) || []));
+      state.tasks = buildInitialTasks(state.rooms);
+      auditHistory = auditRows;
+      auditRows.forEach(row => {
+        if (row.audit_kind !== "control" || !ACTIVE_PERIOD_KEYS.includes(row.period_key)) return;
+        const room = state.rooms.find(item => item.id === row.room_id);
+        if (room) ensureControlTask(room, row.auditor_staff_id);
+      });
+      const taskByRef = new Map(state.tasks.map(item => [`${item.id}|${item.periodKey}`, item]));
+      const auditById = new Map();
+      auditRows.forEach(row => {
+        const item = taskByRef.get(`${row.client_ref}|${row.period_key}`);
+        if (!item) return;
+        item.dbAuditId = row.id;
+        item.auditKind = row.audit_kind || "route";
+        item.status = row.status;
+        item.score = row.score;
+        item.returnComment = row.return_comment || "";
+        if (row.bitrix_task_id) item.bitrixTask = { id: row.bitrix_task_id };
+        if (row.accepted_at) item.acceptedAt = row.accepted_at;
+        auditById.set(row.id, item);
+      });
+      answerRows.forEach(row => {
+        const item = auditById.get(row.audit_id);
+        if (!item) return;
+        item.answers[row.question_key] = { score: row.score, note: row.note || "" };
+      });
+      session = user(profile.staff_id);
+      if (!session) throw new Error("Сотрудник отключён в справочнике");
+      sharedMode = true;
+      persist();
+    }
+    async function activateSharedSession(authSession) {
+      saveSupabaseSession(authSession);
+      await loadSharedState(authSession.user);
+      view = "dashboard";
+      render();
+    }
+    async function refreshSupabaseSession() {
+      if (!supabaseSession?.refresh_token) throw new Error("Нет данных для обновления сессии");
+      const response = await fetch(`${SUPABASE_CONFIG.url}/auth/v1/token?grant_type=refresh_token`, {
+        method: "POST",
+        headers: { apikey: SUPABASE_CONFIG.publishableKey, "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh_token: supabaseSession.refresh_token })
+      });
+      const authSession = await response.json();
+      if (!response.ok) throw new Error(authSession.error_description || "Не удалось обновить сессию");
+      saveSupabaseSession(authSession);
+      return authSession;
+    }
+    async function restoreSharedSession() {
+      if (!supabaseSession?.access_token) return;
+      try {
+        const response = await fetch(`${SUPABASE_CONFIG.url}/auth/v1/user`, { headers: supabaseHeaders() });
+        const authUser = response.ok ? await response.json() : (await refreshSupabaseSession()).user;
+        await loadSharedState(authUser);
+        render();
+      } catch (_) {
+        saveSupabaseSession(null);
+      }
+    }
+    function resetDemo() {
+      const fresh = structuredClone(seed);
+      state.users = fresh.users;
+      state.tasks = fresh.tasks;
+      state.rooms = fresh.rooms;
+      state.datasetVersion = fresh.datasetVersion;
+      persist();
+      toast("Исходный справочник восстановлен");
+      render();
+    }
+    function esc(value = "") {
+      return String(value).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[ch]));
+    }
+    function initials(name) { return name.split(" ").slice(0, 2).map(x => x[0]).join("").toUpperCase(); }
+    function user(id) { return state.users.find(x => x.id === id); }
+    function task(id) { return state.tasks.find(x => x.id === id); }
+    function canManageSettings() { return session?.role === "admin" || session?.role === "chief"; }
+    function buildRoomIssues(room) {
+      const issues = [];
+      if (!room.periodicity) issues.push("Не указана периодичность");
+      if (!room.responsible) issues.push("Не указан ответственный");
+      if (!room.responsibleBitrixId) issues.push("Не сопоставлен пользователь Битрикс24");
+      if (!roomAuditorIds(room).length) issues.push("Не назначен проверяющий");
+      if (!room.chiefId) issues.push("Не назначен главный аудитор");
+      return issues;
+    }
+    function roomStats() {
+      return {
+        missingPeriodicity: state.rooms.filter(room => !room.periodicity).length,
+        missingResponsible: state.rooms.filter(room => !room.responsible).length,
+        missingBitrixMapping: state.rooms.filter(room => !room.responsibleBitrixId).length,
+        missingAuditor: state.rooms.filter(room => !roomAuditorIds(room).length).length
+      };
+    }
+    function syncTasksFromRooms() {
+      const desired = new Map();
+      state.rooms.forEach(room => {
+        roomAuditorIds(room).forEach(auditorId => {
+          const fresh = buildTask(room, auditorId);
+          desired.set(fresh.id, fresh);
+        });
+      });
+      const retained = [];
+      state.tasks.forEach(existing => {
+        const fresh = desired.get(existing.id);
+        if (fresh) {
+          if (existing.periodKey !== fresh.periodKey) {
+            Object.assign(existing, fresh);
+          } else {
+            Object.assign(existing, {
+              responsibleBitrixId: fresh.responsibleBitrixId,
+              responsibleName: fresh.responsibleName,
+              ownerChief: fresh.ownerChief,
+              room: fresh.room,
+              number: fresh.number,
+              type: fresh.type,
+              periodicity: fresh.periodicity,
+              due: fresh.due
+            });
+          }
+          retained.push(existing);
+          desired.delete(existing.id);
+        } else if (existing.status !== "todo" || Object.keys(existing.answers || {}).length) {
+          retained.push(existing);
+        }
+      });
+      state.tasks = [...retained, ...desired.values()];
+    }
+    syncTasksFromRooms();
+    persist();
+    async function saveSharedRoom(room) {
+      await supabaseRequest(`rooms?id=eq.${encodeURIComponent(room.id)}`, {
+        method: "PATCH",
+        body: {
+          source_row: room.sourceRow,
+          source_object: room.sourceObject,
+          number: room.number,
+          name: room.name,
+          checklist: room.checklist,
+          periodicity: room.periodicity || null,
+          responsible_name: room.responsible || null,
+          responsible_bitrix_id: room.responsibleBitrixId ? Number(room.responsibleBitrixId) : null,
+          chief_staff_id: room.chiefId || null,
+          issues: room.issues
+        }
+      });
+      await supabaseRequest(`room_auditors?room_id=eq.${encodeURIComponent(room.id)}`, { method: "DELETE" });
+      const assignments = roomAuditorIds(room).map(auditorId => ({
+        room_id: room.id,
+        auditor_staff_id: auditorId,
+        is_required: false
+      }));
+      if (assignments.length) await supabaseRequest("room_auditors", { method: "POST", body: assignments });
+    }
+    async function persistSharedTask(t) {
+      if (!sharedMode) return;
+      const answers = Object.entries(t.answers || {}).map(([questionKey, answer]) => ({
+        questionKey,
+        score: answer.score,
+        note: answer.note || ""
+      }));
+      const result = await callSharedFunction("audit-save", {
+        clientRef: t.id,
+        periodKey: t.periodKey,
+        roomId: t.sourceRoomId,
+        auditorStaffId: t.auditorId,
+        auditKind: t.auditKind || "route",
+        chiefStaffId: t.ownerChief || null,
+        status: t.status,
+        score: taskScore(t),
+        returnComment: t.returnComment || "",
+        bitrixTaskId: t.bitrixTask?.id ? String(t.bitrixTask.id) : null,
+        acceptedAt: t.acceptedAt || null,
+        answers
+      });
+      t.dbAuditId = result.auditId;
+    }
+    function queueSharedTaskSave(t) {
+      if (!sharedMode) return;
+      clearTimeout(sharedSaveTimers.get(t.id));
+      sharedSaveTimers.set(t.id, setTimeout(() => {
+        persistSharedTask(t).catch(error => toast(`Общая база: ${error.message}`));
+      }, 500));
+    }
+    function roleName(role) { return ({ auditor: "Линейный аудитор", chief: "Главный аудитор", admin: "Администратор" })[role]; }
+    function typeIcon(type) { return type === "Офис" || type === "Прочие помещения" ? icons.building : type === "Транспорт" ? icons.truck : icons.factory; }
+    function statusInfo(status) {
+      return ({
+        todo: ["todo", "Запланировано"],
+        draft: ["draft", "Черновик"],
+        review: ["review", "На проверке"],
+        accepted: ["accepted", "Принято"],
+        returned: ["returned", "На доработке"],
+        actioned: ["actioned", "Задача создана"]
+      })[status] || ["todo", status];
+    }
+    function statusBadge(status) {
+      const [cls, label] = statusInfo(status);
+      return `<span class="status ${cls}">${label}</span>`;
+    }
+    function toast(message) {
+      document.querySelector(".toast")?.remove();
+      const el = document.createElement("div");
+      el.className = "toast";
+      el.textContent = message;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 2800);
+    }
+
+    function render() {
+      document.getElementById("app").innerHTML = session ? renderApp() : renderLogin();
+    }
+
+    function renderLogin() {
+      return `
+        <section class="login-page">
+          <div class="login-hero">
+            <div class="brand">
+              <span class="brand-mark">${icons.shield}</span>
+              <span>СТИЛ ТЕХНОЛОДЖИ · 5С</span>
+            </div>
+            <div class="hero-copy">
+              <h1>Аудиты 5С</h1>
+              <p>СТИЛ ТЕХНОЛОДЖИ</p>
+            </div>
+          </div>
+          <div class="login-side">
+            <div class="login-card">
+              <h2>Вход в систему</h2>
+              <p>Введите персональный код.</p>
+              <form onsubmit="loginSupabaseCode(event)">
+                <label class="field-label" for="sharedCode">Персональный код</label>
+                <input class="code-input" id="sharedCode" autocomplete="off" placeholder="5S-XXXX-XXXX" maxlength="12" required autofocus>
+                <button class="primary-btn full-btn" type="submit">Войти ${icons.arrow}</button>
+                <div id="sharedCodeLoginError"></div>
+              </form>
+              <details class="service-login">
+                <summary>Служебный вход администратора по email</summary>
+                <form onsubmit="loginSupabase(event)">
+                  <label class="field-label" for="sharedEmail">Email</label>
+                  <input class="shared-input" id="sharedEmail" type="email" autocomplete="username" placeholder="name@asyst.ru" required>
+                  <label class="field-label" for="sharedPassword">Пароль</label>
+                  <input class="shared-input" id="sharedPassword" type="password" autocomplete="current-password" placeholder="Пароль" required>
+                  <button class="ghost-btn full-btn" type="submit">Войти как администратор ${icons.arrow}</button>
+                  <div id="sharedLoginError"></div>
+                </form>
+              </details>
+              <details class="service-login">
+                <summary>Локальная демонстрация</summary>
+                <form onsubmit="login(event)">
+                  <label class="field-label" for="loginCode">Демо-код</label>
+                  <input class="code-input" id="loginCode" autocomplete="off" placeholder="КОД" maxlength="20">
+                  <button class="ghost-btn full-btn" type="submit">Открыть демо ${icons.arrow}</button>
+                  <div id="loginError"></div>
+                </form>
+                <div class="demo-box">
+                  <div class="demo-grid">
+                    <button class="demo-code" type="button" onclick="fillCode('A-125')"><b>A-125</b>Линейный аудитор</button>
+                    <button class="demo-code" type="button" onclick="fillCode('G-001')"><b>G-001</b>Главный аудитор</button>
+                    <button class="demo-code" type="button" onclick="fillCode('G-002')"><b>G-002</b>Главный аудитор</button>
+                    <button class="demo-code" type="button" onclick="fillCode('ADM-5S')"><b>ADM-5S</b>Администратор</button>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </div>
+        </section>`;
+    }
+
+    function renderApp() {
+      const nav = navItems();
+      return `
+        <div class="app-shell">
+          <aside class="sidebar">
+            <div class="brand"><span class="brand-mark">${icons.shield}</span><span>СТИЛ · 5С</span></div>
+            <nav class="nav">${nav.map(navButton).join("")}</nav>
+            <div class="sidebar-bottom">
+              <div class="profile-mini">
+                <div class="avatar">${initials(session.name)}</div>
+                <div><b>${esc(session.name)}</b><span>${roleName(session.role)}</span></div>
+              </div>
+              <button class="logout-btn" onclick="logout()">${icons.logout} Выйти</button>
+            </div>
+          </aside>
+          <main class="main">
+            <div class="content">
+              ${renderTopbar()}
+              ${renderView()}
+            </div>
+          </main>
+          <nav class="mobile-nav">${nav.map(navButton).join("")}</nav>
+        </div>`;
+    }
+
+    function navItems() {
+      const result = [
+        ["dashboard", "Главная", icons.home],
+        ["tasks", session.role === "auditor" ? "Мои проверки" : "Маршруты", icons.clipboard]
+      ];
+      if (session.role === "chief") result.push(["control", "Контрольный обход", icons.shield]);
+      if ((session.role === "chief" || session.role === "admin") && state.tasks.some(t => t.status === "review")) result.push(["review", "Согласование", icons.review]);
+      if (session.role === "chief" || session.role === "admin") result.push(["reports", "Отчёты", icons.chart]);
+      if (canManageSettings()) result.push(["admin", "Настройки", icons.settings]);
+      return result;
+    }
+    function navButton(item) {
+      const [id, label, icon] = item;
+      return `<button class="nav-btn ${view === id ? "active" : ""}" onclick="setView('${id}')">${icon}<span>${label}</span></button>`;
+    }
+    function renderTopbar() {
+      const titles = {
+        dashboard: ["Добрый день!", `Аудиты 5С · ${PERIOD_LABEL}`],
+        tasks: [session.role === "auditor" ? "Мои проверки" : "Маршруты аудитов", "Персональные назначения и статусы"],
+        control: ["Контрольный обход", "Выберите помещения для независимой проверки"],
+        review: ["Согласование", "Проверки, ожидающие решения главного аудитора"],
+        reports: ["Отчёты", "Динамика выполнения и корректирующие действия"],
+        admin: ["Настройки", "Роли сотрудников и справочник помещений"],
+        audit: ["Заполнение проверки", "Чек-лист аудита 5С"]
+      };
+      const [title, subtitle] = titles[view] || titles.dashboard;
+      return `
+        <header class="topbar">
+          <div><h1>${title}</h1><p>${subtitle}</p></div>
+          <div class="top-actions">
+            ${sharedMode ? `<span class="status accepted">Общая база</span>` : `<span class="status draft">Локальное демо</span>`}
+            ${session.role === "admin" ? `<button class="ghost-btn" title="${sharedMode ? "Загрузить актуальные назначения, статусы и результаты аудитов" : "Вернуть исходные демонстрационные данные"}" onclick="${sharedMode ? "reloadSharedDirectory()" : "resetDemo()"}">${icons.refresh} ${sharedMode ? "Обновить данные" : "Восстановить справочник"}</button>` : ""}
+            <button class="icon-btn" title="Уведомления">${icons.bell}</button>
+          </div>
+        </header>`;
+    }
+    function renderView() {
+      if (view === "audit") return renderAudit();
+      if (view === "tasks") return renderTasks();
+      if (view === "control") return renderControlRooms();
+      if (view === "review") return renderReview();
+      if (view === "reports") return renderReports();
+      if (view === "admin") return renderAdmin();
+      return renderDashboard();
+    }
+
+    function visibleTasks() {
+      const routes = state.tasks.filter(t => (t.auditKind || "route") === "route");
+      if (session.role === "auditor") return routes.filter(t => t.auditorId === session.id);
+      if (session.role === "chief" && !session.overseeAll) return routes.filter(t => t.auditorId === session.id || t.ownerChief === session.id);
+      return routes;
+    }
+    function renderDashboard() {
+      const tasks = visibleTasks();
+      const todo = tasks.filter(t => ["todo", "draft", "returned"].includes(t.status));
+      const review = tasks.filter(t => t.status === "review");
+      const accepted = tasks.filter(t => ["accepted", "actioned"].includes(t.status));
+      const avg = averageScore(accepted);
+      const firstName = session.name.split(" ")[1] || session.name.split(" ")[0];
+      return `
+        <section class="hero-card">
+          <div>
+            <span class="hero-badge">${session.role === "auditor" ? icons.flag + " Ваш маршрут" : icons.shield + " Контроль аудитов"}</span>
+            <h2>Здравствуйте, ${esc(firstName)}</h2>
+            <p>${session.role === "auditor"
+              ? "В списке отображаются назначенные вам проверки."
+              : "Результаты маршрутов доступны в отчётах. Для независимой оценки используйте раздел «Контрольный обход»."}</p>
+          </div>
+          <div class="hero-score"><strong>${avg || "—"}</strong><span>средний балл</span></div>
+        </section>
+        <section class="metrics">
+          ${metric("Назначено", tasks.length, "проверок в маршруте", icons.clipboard, "")}
+          ${metric("Требуют внимания", todo.length, "нужно заполнить", icons.clock, "warn")}
+          ${session.role !== "auditor" ? metric("На согласовании", review.length, "старые проверки", icons.review, "gold") : ""}
+          ${metric("Принято", accepted.length, "завершено", icons.check, "blue")}
+        </section>
+        <section class="grid-2">
+          <div class="panel">
+            <div class="panel-head">
+              <div><h3>${session.role === "auditor" ? "Текущие проверки" : "Текущие маршруты"}</h3><p>Проверки текущего периода</p></div>
+              <button class="small-link" onclick="setView('tasks')">Все задачи</button>
+            </div>
+            <div class="task-list">${tasks.slice(0, 5).map(renderTaskCard).join("") || `<div class="empty">Назначений пока нет</div>`}</div>
+          </div>
+          <div>
+            <div class="panel">
+              <div class="panel-head"><div><h3>Выполнение плана</h3><p>Текущий период · ${PERIOD_MONTH}</p></div></div>
+              ${progressBlock(tasks)}
+              <div class="legend">
+                ${legend("Принято", accepted.length, "")}
+                ${session.role !== "auditor" ? legend("На согласовании", review.length, "orange") : ""}
+                ${legend("В работе", todo.length, "blue")}
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-head"><div><h3>Правило оценки</h3><p>Для каждой проверки</p></div></div>
+              <div class="legend">
+                ${legend("Соответствует", "2 балла", "")}
+                ${legend("Частично", "1 балл", "orange")}
+                ${legend("Не соответствует", "0 баллов", "blue")}
+              </div>
+            </div>
+          </div>
+        </section>`;
+    }
+    function metric(title, value, note, icon, cls) {
+      return `<div class="metric"><div class="metric-head"><span>${title}</span><span class="metric-icon ${cls}">${icon}</span></div><div class="metric-value">${value}</div><div class="metric-note">${note}</div></div>`;
+    }
+    function legend(label, value, cls) {
+      return `<div class="legend-row"><i class="legend-dot ${cls}"></i><span>${label}</span><b>${value}</b></div>`;
+    }
+    function progressBlock(tasks) {
+      const done = tasks.filter(t => ["accepted", "actioned"].includes(t.status)).length;
+      const pct = tasks.length ? Math.round(done / tasks.length * 100) : 0;
+      return `<div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div><div class="progress-caption"><span>${done} из ${tasks.length} завершено</span><b>${pct}%</b></div>`;
+    }
+    function averageScore(tasks) {
+      const values = tasks.map(t => taskScore(t)).filter(v => Number.isFinite(v) && v > 0);
+      return values.length ? (values.reduce((a, b) => a + b, 0) / values.length).toFixed(1) : "";
+    }
+    function renderTaskCard(t) {
+      const auditor = user(t.auditorId);
+      const canOpen = t.auditorId === session.id && !["review", "accepted", "actioned"].includes(t.status);
+      return `
+        <article class="task-card">
+          <div class="task-symbol ${t.status === "returned" ? "red" : t.type === "Офис" ? "blue" : t.type === "Транспорт" ? "orange" : ""}">${typeIcon(t.type)}</div>
+          <div>
+            <div class="task-title">${esc(t.room)} <span style="color:#8a9892;font-weight:650">· ${esc(t.number)}</span></div>
+            <div class="task-sub"><span>${esc(t.type)}</span><i class="dot"></i><span>${esc(t.periodicity)}</span><i class="dot"></i><span>${esc(t.due)}</span>${session.role !== "auditor" ? `<i class="dot"></i><span>${esc(auditor.name.split(" ").slice(0,2).join(" "))}</span>` : ""}</div>
+            ${t.status === "returned" ? `<div class="return-note">${esc(t.returnComment)}</div>` : ""}
+            ${t.bitrixTask ? `<div class="bitrix-note">Битрикс24: задача №${esc(t.bitrixTask.id)} · фото: ${t.bitrixTask.photoCount || 0}</div>` : ""}
+          </div>
+          <div class="task-action">
+            ${canOpen ? `<button class="primary-btn" onclick="openAudit('${t.id}')">${t.status === "todo" ? "Начать" : "Продолжить"} ${icons.arrow}</button>` : statusBadge(t.status)}
+          </div>
+        </article>`;
+    }
+
+    function renderTasks() {
+      const tasks = visibleTasks().filter(t => taskFilter === "all" || t.status === taskFilter);
+      return `
+        <section class="page-title-row">
+          <div><h2>${session.role === "auditor" ? "Персональный маршрут" : "Все назначенные маршруты"}</h2><p>${session.role === "auditor" ? "Вы видите только закреплённые за вами помещения." : "Фильтруйте задачи по текущему статусу."}</p></div>
+        </section>
+        <div class="filters">
+          ${filterButton("all", "Все")}
+          ${filterButton("todo", "Запланировано")}
+          ${filterButton("draft", "Черновики")}
+          ${filterButton("returned", "На доработке")}
+          ${filterButton("review", "На согласовании")}
+          ${filterButton("accepted", "Принято")}
+          ${filterButton("actioned", "Задача создана")}
+        </div>
+        <section class="panel">
+          <div class="task-list">${tasks.map(renderTaskCard).join("") || `<div class="empty">В этой категории задач нет</div>`}</div>
+        </section>`;
+    }
+    function filterButton(id, title) {
+      return `<button class="filter-chip ${taskFilter === id ? "active" : ""}" onclick="setTaskFilter('${id}')">${title}</button>`;
+    }
+
+    function currentControlTask(room) {
+      return state.tasks.find(t => t.auditKind === "control" && t.sourceRoomId === room.id && t.auditorId === session.id && t.periodKey === scheduleFor(room.periodicity).periodKey);
+    }
+    function renderControlRooms() {
+      const rooms = state.rooms.filter(room => `${room.number} ${room.name} ${room.sourceObject} ${room.checklist}`.toLowerCase().includes(roomSearch.toLowerCase()));
+      const completed = rooms.filter(room => ["accepted", "actioned"].includes(currentControlTask(room)?.status)).length;
+      return `
+        <section class="page-title-row">
+          <div><h2>Контрольный обход</h2><p>Главные аудиторы видят все помещения и выбирают объекты для независимой проверки.</p></div>
+          <button class="primary-btn" onclick="openNextControlRoom()">${icons.arrow} Следующее помещение</button>
+        </section>
+        <section class="metrics">
+          ${metric("Помещения", state.rooms.length, "доступны для проверки", icons.building, "")}
+          ${metric("Проверено вами", completed, "в текущем периоде", icons.check, "blue")}
+          ${metric("Осталось", Math.max(0, rooms.length - completed), "можно пройти выборочно", icons.clock, "warn")}
+        </section>
+        <section class="panel">
+          <div class="panel-head">
+            <div><h3>Выберите помещение</h3><p>Контрольный аудит сохраняется отдельно от оценки закреплённого аудитора.</p></div>
+            <input class="search-input" value="${esc(roomSearch)}" placeholder="Поиск помещения" oninput="setRoomSearch(this.value)">
+          </div>
+          <div class="task-list">${rooms.map(renderControlRoomCard).join("") || `<div class="empty">Помещения не найдены</div>`}</div>
+        </section>`;
+    }
+    function renderControlRoomCard(room) {
+      const t = currentControlTask(room);
+      const completed = ["accepted", "actioned"].includes(t?.status);
+      return `
+        <article class="task-card">
+          <div class="task-symbol ${room.checklist === "Офис" ? "blue" : room.checklist === "Транспорт" ? "orange" : ""}">${typeIcon(room.checklist)}</div>
+          <div>
+            <div class="task-title">${esc(room.name)} <span style="color:#8a9892;font-weight:650">· ${esc(room.number || room.sourceObject)}</span></div>
+            <div class="task-sub"><span>${esc(room.checklist)}</span><i class="dot"></i><span>${esc(periodicityLabel(room.periodicity))}</span>${t ? `<i class="dot"></i>${statusBadge(t.status)}` : ""}</div>
+          </div>
+          <div class="task-action">
+            <button class="${completed ? "ghost-btn" : "primary-btn"}" onclick="startControlAudit('${room.id}')">${completed ? "Пройти ещё раз" : "Начать"} ${icons.arrow}</button>
+          </div>
+        </article>`;
+    }
+
+    function renderAudit() {
+      const t = task(auditTaskId);
+      if (!t) { view = "tasks"; return renderTasks(); }
+      if (quickAuditPrompt && isDirectAudit(t)) return renderQuickSapronovAudit(t);
+      const section = S5[auditStep];
+      const score = taskScore(t);
+      const answered = Object.keys(t.answers || {}).length;
+      const missingNotes = hasMissingNotes(t);
+      return `
+        <section class="audit-layout">
+          <div>
+            <div class="audit-head">
+              <div class="audit-head-top">
+                <div>
+                  <button class="small-link" onclick="setView('tasks')">← Назад к маршруту</button>
+                  <h2>${esc(t.room)} · ${esc(t.number)}</h2>
+                  <p>${esc(t.type)} · ${esc(t.periodicity)} · ${esc(t.due)}</p>
+                </div>
+                <div class="audit-score"><b>${score}</b><span>из 50</span></div>
+              </div>
+              ${t.status === "returned" ? `<div class="return-note"><b>Комментарий главного аудитора:</b><br>${esc(t.returnComment)}</div>` : ""}
+            </div>
+            <div class="step-strip">${S5.map((s, i) => `<button class="step-tab ${i === auditStep ? "active" : ""} ${sectionDone(t, s) ? "done" : ""}" onclick="setAuditStep(${i})">${s.short}</button>`).join("")}</div>
+            <div class="panel">
+              <div class="panel-head"><div><h3>${section.title}</h3><p>${section.description}</p></div><button class="ghost-btn" onclick="fillSectionWithTwo('${t.id}','${section.key}')">${icons.check} Поставить 2 по всему разделу</button></div>
+              ${section.questions.map((q, index) => renderQuestion(t, section, q, index)).join("")}
+              <div class="audit-footer">
+                <button class="ghost-btn" onclick="saveDraft()">${icons.clipboard} Сохранить черновик</button>
+                <div>
+                  ${auditStep > 0 ? `<button class="ghost-btn" onclick="setAuditStep(${auditStep - 1})">Назад</button>` : ""}
+                  ${auditStep < 4 ? `<button class="primary-btn" onclick="setAuditStep(${auditStep + 1})">Далее ${icons.arrow}</button>` : `<button class="primary-btn" onclick="submitAudit()" ${answered < 25 || missingNotes ? "disabled" : ""}>${isDirectAudit(t) && issueList(t).length ? "Завершить и создать задачу" : "Завершить аудит"} ${icons.check}</button>`}
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside>
+            <div class="side-note">
+              <h4>Прогресс проверки</h4>
+              <div class="progress-track"><div class="progress-fill" style="width:${answered / 25 * 100}%"></div></div>
+              <div class="progress-caption"><span>Заполнено</span><b>${answered} / 25</b></div>
+            </div>
+            <div class="side-note">
+              <h4>Как оценивать</h4>
+              <ul><li><b>2</b> — соответствует</li><li><b>1</b> — частично</li><li><b>0</b> — не соответствует</li></ul>
+              <p>При оценке 0 или 1 кратко опишите замечание. Фото можно приложить по желанию.</p>
+            </div>
+            <div class="side-note">
+              <h4>Фото к проверке</h4>
+              <p>Необязательно. До 5 фото. При создании задачи фотографии будут приложены к ней автоматически.</p>
+              <input class="file-input" type="file" accept="image/*" multiple onchange="rememberFiles('${t.id}', this.files)">
+              ${t.files?.length ? `<p><b>Добавлено файлов:</b> ${t.files.length}<br>${t.files.map(file => esc(file.name || file)).join("<br>")}</p>` : ""}
+            </div>
+          </aside>
+        </section>`;
+    }
+    function renderQuickSapronovAudit(t) {
+      return `
+        <section class="quick-audit">
+          <button class="small-link" onclick="setView('${t.auditKind === "control" ? "control" : "tasks"}')">← Назад к маршруту</button>
+          <h2>${esc(t.room)} · ${esc(t.number)}</h2>
+          <p>${esc(t.type)} · ${esc(t.periodicity)} · ${esc(t.due)}</p>
+          <div class="quick-audit-actions">
+            <button class="primary-btn" onclick="completeAuditWithoutIssues('${t.id}')">${icons.check} Замечаний нет</button>
+            <button class="ghost-btn" onclick="openSapronovChecklist()">Есть замечание ${icons.arrow}</button>
+          </div>
+        </section>`;
+    }
+    function renderQuestion(t, section, question, index) {
+      const key = `${section.key}-${index}`;
+      const value = (t.answers || {})[key] || {};
+      return `
+        <div class="question">
+          <div class="question-title"><span class="question-num">${index + 1}</span><span>${esc(question)}</span></div>
+          <div class="score-buttons">
+            ${scoreChoice(t.id, key, 0, "0 · Не соответствует", value.score)}
+            ${scoreChoice(t.id, key, 1, "1 · Частично", value.score)}
+            ${scoreChoice(t.id, key, 2, "2 · Соответствует", value.score)}
+          </div>
+          ${value.score === 0 || value.score === 1 ? `<textarea class="note-box" placeholder="Что именно нужно исправить?" oninput="setNote('${t.id}','${key}',this.value)">${esc(value.note || "")}</textarea><div class="question-hint">Для оценки ${value.score} укажите замечание</div>` : ""}
+        </div>`;
+    }
+    function scoreChoice(taskId, key, score, text, selected) {
+      return `<button class="score-choice ${selected === score ? `sel-${score}` : ""}" onclick="setScore('${taskId}','${key}',${score})">${score === 2 ? icons.check : score === 0 ? icons.x : "◐"} ${text}</button>`;
+    }
+    function taskScore(t) {
+      return Object.values(t.answers || {}).reduce((sum, x) => sum + (Number.isFinite(x.score) ? x.score : 0), 0);
+    }
+    function sectionDone(t, section) {
+      return section.questions.every((_, index) => Number.isFinite(t.answers?.[`${section.key}-${index}`]?.score));
+    }
+    function hasMissingNotes(t) {
+      return Object.values(t.answers || {}).some(x => (x.score === 0 || x.score === 1) && !String(x.note || "").trim());
+    }
+    function issueList(t) {
+      return Object.entries(t.answers || {}).flatMap(([key, answer]) => {
+        if (answer.score !== 0 && answer.score !== 1) return [];
+        const [sectionKey, rawIndex] = key.split("-");
+        const section = S5.find(item => item.key === sectionKey);
+        const question = section?.questions[Number(rawIndex)] || key;
+        return [{ question, score: answer.score, note: answer.note || "Без пояснения" }];
+      });
+    }
+    function isSapronovOwnAudit(t) {
+      return session?.id === "u2" && t.auditorId === "u2";
+    }
+    function isDirectAudit(t) {
+      return t.auditKind === "control" || isSapronovOwnAudit(t);
+    }
+
+    function renderReview() {
+      const tasks = visibleTasks().filter(t => t.status === "review" && (session.role === "admin" || t.ownerChief === session.id));
+      return `
+        <section class="page-title-row">
+          <div><h2>Ожидают вашего решения</h2><p>Ответы аудитора доступны для просмотра, но не для редактирования.</p></div>
+        </section>
+        <section class="metrics">
+          ${metric("На согласовании", tasks.length, "проверок ожидают решения", icons.review, "gold")}
+          ${metric("Средний результат", averageScore(tasks) || "—", "баллов из 50", icons.chart, "")}
+          ${metric("С замечаниями", tasks.filter(t => taskScore(t) < 50).length, "требуют решения", icons.flag, "warn")}
+          ${metric("Главных аудиторов", state.users.filter(u => u.role === "chief").length, "назначено", icons.shield, "blue")}
+        </section>
+        <section class="panel">
+          <div class="panel-head"><div><h3>Проверки на согласовании</h3><p>Примите результат или верните с обязательным комментарием</p></div></div>
+          ${tasks.map(renderReviewCard).join("") || `<div class="empty">Новых проверок на согласование нет</div>`}
+        </section>`;
+    }
+    function renderReviewCard(t) {
+      const auditor = user(t.auditorId);
+      const issues = Object.values(t.answers || {}).filter(a => a.score < 2).length;
+      return `
+        <article class="review-card">
+          <div>
+            <h4>${esc(t.room)} · ${esc(t.number)}</h4>
+            <div class="review-meta">
+              <span>${esc(auditor.name)}</span><i class="dot"></i><span>${esc(t.type)}</span><i class="dot"></i><b>${taskScore(t)} / 50</b><i class="dot"></i><span>${issues} замеч.</span>
+            </div>
+          </div>
+          <div class="review-actions">
+            <button class="danger-btn" onclick="openReturnModal('${t.id}')">Вернуть и создать задачу</button>
+            <button class="primary-btn" onclick="acceptTask('${t.id}')">${icons.check} Принять</button>
+          </div>
+        </article>`;
+    }
+
+    function renderReports() {
+      const tasks = visibleTasks();
+      const accepted = tasks.filter(t => ["accepted", "actioned"].includes(t.status));
+      const issues = tasks.reduce((sum, t) => sum + Object.values(t.answers || {}).filter(a => a.score < 2).length, 0);
+      const comparisonRows = buildComparisonRows().filter(row => row.periodKey === scheduleFor(row.room.periodicity).periodKey);
+      return `
+        <section class="page-title-row">
+          <div><h2>Сводка за ${PERIOD_MONTH}</h2><p>Оценки закреплённых аудиторов и контрольные обходы главных аудиторов.</p></div>
+          <button class="primary-btn" onclick="exportYearExcel()">${icons.download} Выгрузить годовой Excel</button>
+        </section>
+        <section class="metrics">
+          ${metric("Принято", accepted.length, "завершённых проверок", icons.check, "")}
+          ${metric("Средний балл", averageScore(accepted) || "—", "из максимальных 50", icons.chart, "blue")}
+          ${metric("Замечания", issues, "для корректирующих действий", icons.flag, "warn")}
+          ${metric("Выполнение", tasks.length ? Math.round(accepted.length / tasks.length * 100) + "%" : "0%", "плана на период", icons.clipboard, "gold")}
+        </section>
+        <section class="grid-2">
+          <div class="panel">
+            <div class="panel-head"><div><h3>Результаты по объектам</h3><p>Принятые и ожидающие согласования проверки</p></div></div>
+            <div class="table-wrap">
+              <table><thead><tr><th>Объект</th><th>Аудитор</th><th>Оценка аудитора</th><th>Контрольная оценка</th><th>КПЭ, %</th><th>Статус</th></tr></thead>
+              <tbody>${comparisonRows.map(row => `<tr><td><b>${esc(row.room.name)}</b><br><span style="color:var(--muted)">${esc(row.room.number || row.room.sourceObject)}</span></td><td>${esc(user(row.auditorId)?.name.split(" ").slice(0,2).join(" ") || row.auditorId)}</td><td><b>${row.routeScore ?? "—"}</b></td><td>${row.controlScore ?? "—"}${row.controlAuditor ? `<br><span style="color:var(--muted)">${esc(row.controlAuditor)}</span>` : ""}</td><td><b>${row.matchPercent === null ? "—" : row.matchPercent + "%"}</b></td><td>${esc(row.routeStatus)}</td></tr>`).join("")}</tbody></table>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><div><h3>Периодичность</h3><p>Расписание аудитов</p></div></div>
+            <div class="legend">
+              ${legend("ПР + Склад", "еженедельно", "")}
+              ${legend("Офис", "ежемесячно", "blue")}
+              ${legend("Прочие помещения", "ежемесячно", "orange")}
+              ${legend("Транспорт", "ежемесячно", "")}
+              ${legend("Корректирующие действия", issues, "orange")}
+            </div>
+          </div>
+        </section>`;
+    }
+
+    function renderAdmin() {
+      const filteredRooms = state.rooms.filter(r => `${r.number} ${r.name} ${r.sourceObject} ${r.checklist} ${r.responsible}`.toLowerCase().includes(roomSearch.toLowerCase()));
+      const unresolved = state.rooms.filter(r => r.issues.length);
+      const stats = roomStats();
+      return `
+        <section class="metrics">
+          ${metric("Сотрудники", state.users.length - 1, "учётных записей", icons.users, "")}
+          ${metric("Главные аудиторы", state.users.filter(u => u.role === "chief").length, "назначено", icons.shield, "gold")}
+          ${metric("Объекты", state.rooms.length, "помещения и транспорт", icons.building, "blue")}
+          ${metric("Маршруты", state.tasks.length, "сформированы по назначениям", icons.clipboard, "")}
+        </section>
+        <section class="panel">
+          <div class="panel-head">
+            <div><h3>Контроль заполнения справочника</h3><p>Назначения можно уточнять прямо на сайте. ${sharedMode ? "Изменения сохраняются в общей базе." : "В демо-режиме изменения сохраняются в этом браузере."}</p></div>
+          </div>
+          <div class="legend">
+            ${legend("Без периодичности", stats.missingPeriodicity, "orange")}
+            ${legend("Без ответственного", stats.missingResponsible, "orange")}
+            ${legend("Без ID Битрикс24", stats.missingBitrixMapping, "orange")}
+            ${legend("Без проверяющего", stats.missingAuditor, "orange")}
+            ${legend("Полностью готовых маршрутов", state.tasks.length, "")}
+          </div>
+          <p class="muted" style="margin:14px 0 0">Еженедельные проверки обновляются каждый понедельник. Ежемесячные проверки обновляются первого числа месяца.</p>
+          <p class="muted" style="margin:14px 0 0">Требуют уточнения: ${unresolved.length}. Это не мешает использовать уже сформированные маршруты.</p>
+        </section>
+        ${session.role === "admin" ? `<section class="panel">
+          <div class="panel-head">
+            <div><h3>Роли сотрудников</h3><p>Назначайте и снимайте роль главного аудитора без изменения кода сайта.</p></div>
+            <button class="secondary-btn" onclick="openStaffEditor()">Добавить сотрудника</button>
+          </div>
+          <div class="table-wrap">
+            <table><thead><tr><th>Сотрудник</th><th>Доступ</th><th>Роль</th><th>Назначение</th><th></th></tr></thead>
+            <tbody>${state.users.filter(u => u.role !== "admin").map(renderUserRow).join("")}</tbody></table>
+          </div>
+        </section>` : ""}
+        <section class="panel">
+          <div class="panel-head">
+            <div><h3>Справочник помещений</h3><p>Нажмите «Изменить», чтобы закрепить проверяющих, главного аудитора и ответственного.</p></div>
+            <input class="search" placeholder="Номер, название или ответственный" value="${esc(roomSearch)}" oninput="setRoomSearch(this.value)">
+          </div>
+          <div class="table-wrap">
+            <table><thead><tr><th>Номер</th><th>Помещение</th><th>Чек-лист</th><th>Периодичность</th><th>Кто проверяет</th><th>Ответственный</th><th>Главный аудитор</th><th>Статус</th><th></th></tr></thead>
+            <tbody>${filteredRooms.map(renderRoomRow).join("")}</tbody></table>
+          </div>
+        </section>`;
+    }
+    function renderRoomRow(room) {
+      const auditors = roomAuditorIds(room).map(user).filter(Boolean);
+      const chief = user(room.chiefId);
+      return `<tr>
+        <td><b>${esc(room.number || "—")}</b><div class="muted">${esc(room.sourceObject)}</div></td>
+        <td>${esc(room.name)}</td>
+        <td>${esc(room.checklist)}</td>
+        <td>${esc(periodicityLabel(room.periodicity))}</td>
+        <td>${auditors.length ? auditors.map(auditor => `<div>${esc(auditor.name)}</div>`).join("") : '<span class="status returned">Не назначен</span>'}</td>
+        <td>${esc(room.responsible || "Не указан")}<div class="muted">${room.responsibleBitrixId ? "Битрикс24 подключён" : "Нет ID Битрикс24"}</div></td>
+        <td>${esc(chief?.name || "Не назначен")}</td>
+        <td>${room.issues.length ? room.issues.map(issue => `<span class="status draft" style="margin:2px">${esc(issue)}</span>`).join("") : '<span class="status accepted">Готово</span>'}</td>
+        <td><button class="ghost-btn room-edit-btn" onclick="openRoomEditor('${room.id}')">Изменить</button></td>
+      </tr>`;
+    }
+    function renderUserRow(u) {
+      return `
+        <tr>
+          <td><div class="person"><div class="avatar">${initials(u.name)}</div><div><b>${esc(u.name)}</b><span>${esc(u.dept)}</span></div></div></td>
+          <td>${sharedMode ? `<div class="access-actions"><button class="secondary-btn" onclick="issueSharedCode('${u.id}')">Выдать новый код</button><button class="ghost-btn" onclick="disableSharedCode('${u.id}')">Отключить</button></div>` : `<b>${esc(u.code)}</b>`}</td>
+          <td><button class="role-toggle ${u.role === "chief" ? "on" : ""}" onclick="toggleChief('${u.id}')">${u.role === "chief" ? "★ Главный аудитор" : "Линейный аудитор"}</button></td>
+          <td>${esc(u.rooms)}</td>
+          <td><button class="ghost-btn" onclick="openStaffEditor('${u.id}')">Изменить</button></td>
+        </tr>`;
+    }
+
+    function login(event) {
+      event.preventDefault();
+      const code = document.getElementById("loginCode").value.trim().toUpperCase();
+      const found = state.users.find(u => u.code === code);
+      if (!found) {
+        document.getElementById("loginError").innerHTML = `<div class="login-error">Код не найден. Проверьте ввод или выберите демо-вход.</div>`;
+        return;
+      }
+      session = found;
+      view = "dashboard";
+      render();
+    }
+    async function loginSupabase(event) {
+      event.preventDefault();
+      const errorBox = document.getElementById("sharedLoginError");
+      errorBox.innerHTML = "";
+      try {
+        const response = await fetch(`${SUPABASE_CONFIG.url}/auth/v1/token?grant_type=password`, {
+          method: "POST",
+          headers: { apikey: SUPABASE_CONFIG.publishableKey, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: document.getElementById("sharedEmail").value.trim(),
+            password: document.getElementById("sharedPassword").value
+          })
+        });
+        const authSession = await response.json();
+        if (!response.ok) throw new Error(authSession.error_description || "Неверный email или пароль");
+        await activateSharedSession(authSession);
+      } catch (error) {
+        saveSupabaseSession(null);
+        errorBox.innerHTML = `<div class="login-error">${esc(error.message)}</div>`;
+      }
+    }
+    async function loginSupabaseCode(event) {
+      event.preventDefault();
+      const errorBox = document.getElementById("sharedCodeLoginError");
+      errorBox.innerHTML = "";
+      try {
+        const result = await callStaffCodeAuth({
+          action: "login",
+          code: document.getElementById("sharedCode").value.trim().toUpperCase()
+        });
+        await activateSharedSession(result.session);
+      } catch (error) {
+        saveSupabaseSession(null);
+        errorBox.innerHTML = `<div class="login-error">${esc(error.message)}</div>`;
+      }
+    }
+    function fillCode(code) {
+      document.getElementById("loginCode").value = code;
+      document.getElementById("loginCode").focus();
+    }
+    async function logout() {
+      if (sharedMode && supabaseSession?.access_token) {
+        fetch(`${SUPABASE_CONFIG.url}/auth/v1/logout`, { method: "POST", headers: supabaseHeaders() }).catch(() => {});
+      }
+      saveSupabaseSession(null);
+      sharedMode = false;
+      session = null;
+      view = "dashboard";
+      auditTaskId = null;
+      render();
+    }
+    async function reloadSharedDirectory() {
+      if (!sharedMode || !supabaseSession?.user) return;
+      try {
+        await loadSharedState(supabaseSession.user);
+        toast("Данные обновлены из общей базы");
+        render();
+      } catch (error) {
+        toast(error.message);
+      }
+    }
+    function setView(next) { view = next; render(); window.scrollTo(0, 0); }
+    function setTaskFilter(next) { taskFilter = next; render(); }
+    function setRoomSearch(value) { roomSearch = value; render(); }
+    function selectOptions(values, current) {
+      return values.map(value => `<option value="${esc(value)}" ${value === current ? "selected" : ""}>${esc(value || "Не указана")}</option>`).join("");
+    }
+    function openRoomEditor(id) {
+      if (!canManageSettings()) return;
+      const room = state.rooms.find(item => item.id === id);
+      if (!room) return;
+      const auditorIds = roomAuditorIds(room);
+      const currentPeriodicity = room.periodicity ? (isWeekly(room.periodicity) ? "еженедельно" : "ежемесячно") : "";
+      const periodicities = ["", "еженедельно", "ежемесячно"];
+      const checklists = [...new Set(["Производство и склад", "Офис", "Прочие помещения", "Транспорт", room.checklist].filter(Boolean))];
+      const chiefs = state.users.filter(item => item.role === "chief");
+      const wrap = document.createElement("div");
+      wrap.className = "modal-backdrop";
+      wrap.id = "roomEditorModal";
+      wrap.innerHTML = `<div class="modal">
+        <h3>Настроить помещение</h3>
+        <p><b>${esc(room.name)}</b> · ${esc(room.number || room.sourceObject)}. Отметьте всех, кто должен проходить аудит этого объекта.</p>
+        <div class="room-editor-grid">
+          <div><label>Периодичность</label><select id="roomPeriodicity">${selectOptions(periodicities, currentPeriodicity)}</select></div>
+          <div><label>Тип чек-листа</label><select id="roomChecklist">${selectOptions(checklists, room.checklist)}</select></div>
+          <div><label>Ответственный за помещение</label><input id="roomResponsible" value="${esc(room.responsible || "")}" placeholder="ФИО или сокращение из Excel"></div>
+          <div><label>ID ответственного в Битрикс24</label><input id="roomResponsibleBitrixId" value="${esc(room.responsibleBitrixId || "")}" placeholder="Например: 291"></div>
+          <div class="full"><label>Кто проходит аудит помещения</label>
+            <div class="check-list">${state.users.filter(item => item.role !== "admin").map(item => `<label class="check-item"><input type="checkbox" name="roomAuditor" value="${item.id}" ${auditorIds.includes(item.id) ? "checked" : ""}> <span>${esc(item.name)}</span></label>`).join("")}</div>
+          </div>
+          <div class="full"><label>Главный аудитор для контроля помещения</label><select id="roomChief">${chiefs.map(item => `<option value="${item.id}" ${item.id === room.chiefId ? "selected" : ""}>${esc(item.name)}</option>`).join("")}</select></div>
+        </div>
+        <div class="modal-actions"><button class="ghost-btn" onclick="closeRoomEditor()">Отмена</button><button class="primary-btn" onclick="saveRoomSettings('${room.id}')">Сохранить назначения</button></div>
+      </div>`;
+      document.body.appendChild(wrap);
+    }
+    function closeRoomEditor() { document.getElementById("roomEditorModal")?.remove(); }
+    function openStaffEditor(id = "") {
+      if (session?.role !== "admin") return;
+      const person = id ? user(id) : null;
+      if (id && !person) return;
+      const wrap = document.createElement("div");
+      wrap.className = "modal-backdrop";
+      wrap.id = "staffEditorModal";
+      wrap.innerHTML = `<div class="modal">
+        <h3>${person ? "Изменить сотрудника" : "Добавить сотрудника"}</h3>
+        <p>${person ? "Измените данные сотрудника и сохраните карточку." : "После сохранения выдайте сотруднику персональный код входа."}</p>
+        <div class="room-editor-grid">
+          <div class="full"><label>ФИО</label><input id="staffFullName" value="${esc(person?.name || "")}" placeholder="Например: Иванов Иван Иванович"></div>
+          <div><label>Подразделение</label><input id="staffDepartment" value="${esc(person?.dept || "")}" placeholder="Например: Склад"></div>
+          <div><label>ID пользователя в Битрикс24</label><input id="staffBitrixId" value="${esc(person?.bitrixId || "")}" placeholder="Например: 291"></div>
+          <div class="full"><label>Роль</label><select id="staffRole"><option value="auditor" ${person?.role !== "chief" ? "selected" : ""}>Линейный аудитор</option><option value="chief" ${person?.role === "chief" ? "selected" : ""}>Главный аудитор</option></select></div>
+        </div>
+        <div class="modal-actions"><button class="ghost-btn" onclick="closeStaffEditor()">Отмена</button><button class="primary-btn" onclick="saveStaffMember('${id}')">Сохранить сотрудника</button></div>
+      </div>`;
+      document.body.appendChild(wrap);
+    }
+    function closeStaffEditor() { document.getElementById("staffEditorModal")?.remove(); }
+    async function saveStaffMember(id = "") {
+      if (session?.role !== "admin") return;
+      const existing = id ? user(id) : null;
+      const name = document.getElementById("staffFullName").value.trim();
+      const dept = document.getElementById("staffDepartment").value.trim();
+      const bitrixId = document.getElementById("staffBitrixId").value.trim();
+      const role = document.getElementById("staffRole").value;
+      if (!name) return toast("Укажите ФИО сотрудника");
+      if (bitrixId && !/^\d+$/.test(bitrixId)) return toast("ID пользователя Битрикс24 должен состоять из цифр");
+      if (existing?.role === "chief" && role !== "chief" && state.rooms.some(room => room.chiefId === id)) {
+        return toast("Сначала назначьте помещения другому главному аудитору");
+      }
+      const staffId = id || `staff-${typeof crypto.randomUUID === "function" ? crypto.randomUUID() : Date.now().toString(36)}`;
+      const next = {
+        id: staffId,
+        bitrixId,
+        code: existing?.code || "",
+        name,
+        dept,
+        role,
+        overseeAll: existing?.overseeAll || false,
+        rooms: existing?.rooms || ""
+      };
+      try {
+        if (sharedMode) {
+          const body = {
+            full_name: name,
+            department: dept,
+            bitrix_id: bitrixId ? Number(bitrixId) : null,
+            role,
+            oversee_all: next.overseeAll,
+            is_active: true
+          };
+          await supabaseRequest(id ? `staff_members?id=eq.${encodeURIComponent(id)}` : "staff_members", {
+            method: id ? "PATCH" : "POST",
+            body: id ? body : { id: staffId, ...body },
+            prefer: "return=minimal"
+          });
+          await loadSharedState(supabaseSession.user);
+        } else if (existing) {
+          Object.assign(existing, next);
+        } else {
+          state.users.push(next);
+        }
+        persist();
+        closeStaffEditor();
+        toast(id ? "Карточка сотрудника обновлена" : "Сотрудник добавлен. Теперь выдайте ему код входа");
+        render();
+      } catch (error) {
+        toast(`Не удалось сохранить сотрудника: ${error.message}`);
+      }
+    }
+    async function saveRoomSettings(id) {
+      if (!canManageSettings()) return;
+      const room = state.rooms.find(item => item.id === id);
+      if (!room) return;
+      const selected = [...document.querySelectorAll('input[name="roomAuditor"]:checked')].map(input => input.value);
+      room.auditorIds = [...new Set(selected)];
+      room.auditorId = room.auditorIds[0] || "";
+      room.periodicity = document.getElementById("roomPeriodicity").value;
+      room.checklist = document.getElementById("roomChecklist").value;
+      room.responsible = document.getElementById("roomResponsible").value.trim();
+      room.responsibleBitrixId = document.getElementById("roomResponsibleBitrixId").value.trim();
+      room.chiefId = document.getElementById("roomChief").value;
+      room.issues = buildRoomIssues(room);
+      syncTasksFromRooms();
+      persist();
+      try {
+        if (sharedMode) await saveSharedRoom(room);
+        closeRoomEditor();
+        toast(sharedMode ? "Назначения сохранены в общей базе" : "Назначения помещения сохранены");
+      } catch (error) {
+        toast(`Не удалось сохранить в общей базе: ${error.message}`);
+      }
+      render();
+    }
+    function openAudit(id) {
+      const selectedTask = task(id);
+      auditTaskId = id;
+      auditStep = 0;
+      quickAuditPrompt = !!selectedTask && isDirectAudit(selectedTask) && !Object.keys(selectedTask.answers || {}).length;
+      view = "audit";
+      render();
+      window.scrollTo(0, 0);
+    }
+    function startControlAudit(roomId) {
+      if (session?.role !== "chief") return;
+      const room = state.rooms.find(item => item.id === roomId);
+      if (!room) return;
+      openAudit(ensureControlTask(room, session.id).id);
+    }
+    function openNextControlRoom() {
+      if (session?.role !== "chief") return;
+      const room = state.rooms.find(item => !["accepted", "actioned"].includes(currentControlTask(item)?.status)) || state.rooms[0];
+      if (room) startControlAudit(room.id);
+    }
+    function openSapronovChecklist() { quickAuditPrompt = false; render(); window.scrollTo(0, 0); }
+    function setAuditStep(index) { auditStep = index; render(); window.scrollTo(0, 0); }
+    function fillSectionWithTwo(id, sectionKey) {
+      const t = task(id);
+      const section = S5.find(item => item.key === sectionKey);
+      if (!t || !section) return;
+      t.answers ||= {};
+      section.questions.forEach((_, index) => {
+        t.answers[`${section.key}-${index}`] = { score: 2, note: "" };
+      });
+      t.status = "draft";
+      persist();
+      queueSharedTaskSave(t);
+      render();
+    }
+    function setScore(id, key, score) {
+      const t = task(id);
+      t.answers ||= {};
+      t.answers[key] ||= { note: "" };
+      t.answers[key].score = score;
+      if (score === 2) t.answers[key].note = "";
+      t.status = "draft";
+      persist();
+      queueSharedTaskSave(t);
+      render();
+    }
+    function setNote(id, key, value) {
+      const t = task(id);
+      t.answers[key].note = value;
+      persist();
+      queueSharedTaskSave(t);
+    }
+    function readDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error("Не удалось прочитать фото"));
+        reader.readAsDataURL(file);
+      });
+    }
+    function loadImage(dataUrl) {
+      return new Promise((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => resolve(image);
+        image.onerror = () => reject(new Error("Не удалось обработать фото"));
+        image.src = dataUrl;
+      });
+    }
+    async function preparePhoto(file) {
+      if (!file.type.startsWith("image/")) throw new Error("Можно прикладывать только изображения");
+      const image = await loadImage(await readDataUrl(file));
+      const maxSide = 1600;
+      const ratio = Math.min(1, maxSide / Math.max(image.width, image.height));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.round(image.width * ratio));
+      canvas.height = Math.max(1, Math.round(image.height * ratio));
+      canvas.getContext("2d").drawImage(image, 0, 0, canvas.width, canvas.height);
+      return {
+        name: file.name.replace(/\.[^.]+$/, "") + ".jpg",
+        base64: canvas.toDataURL("image/jpeg", .82).split(",")[1]
+      };
+    }
+    async function preparePhotos(files) {
+      const selected = Array.from(files).slice(0, 5);
+      return Promise.all(selected.map(preparePhoto));
+    }
+    async function rememberFiles(id, files) {
+      const t = task(id);
+      try {
+        toast("Обрабатываем фото...");
+        t.files = await preparePhotos(files);
+        persist();
+        toast(`Добавлено файлов: ${t.files.length}`);
+        render();
+      } catch (error) {
+        toast(error.message);
+      }
+    }
+    async function rememberReturnFiles(files) {
+      try {
+        returnPhotos = await preparePhotos(files);
+        document.getElementById("returnPhotoCount").textContent = `Добавлено фото: ${returnPhotos.length}`;
+      } catch (error) {
+        toast(error.message);
+      }
+    }
+    async function saveDraft() {
+      const t = task(auditTaskId);
+      t.status = "draft";
+      persist();
+      try { await persistSharedTask(t); } catch (error) { toast(`Общая база: ${error.message}`); }
+      toast("Черновик сохранён");
+      view = "tasks";
+      render();
+    }
+    async function submitAudit() {
+      const t = task(auditTaskId);
+      if (Object.keys(t.answers || {}).length < 25) return toast("Заполните все 25 вопросов");
+      if (hasMissingNotes(t)) return toast("Добавьте комментарии к оценкам 0 и 1");
+      if (isDirectAudit(t)) return submitSapronovAudit(t);
+      t.status = "accepted";
+      t.score = taskScore(t);
+      t.returnComment = "";
+      t.acceptedBy = session.id;
+      t.acceptedAt = new Date().toISOString();
+      persist();
+      try { await persistSharedTask(t); } catch (error) { return toast(`Общая база: ${error.message}`); }
+      toast("Аудит завершён");
+      view = "tasks";
+      render();
+    }
+    async function submitSapronovAudit(t) {
+      const issues = issueList(t);
+      t.score = taskScore(t);
+      if (!issues.length) {
+        t.status = "accepted";
+        t.acceptedBy = session.id;
+        t.acceptedAt = new Date().toISOString();
+        persist();
+        try { await persistSharedTask(t); } catch (error) { return toast(`Общая база: ${error.message}`); }
+        toast("Аудит завершён без замечаний");
+        view = t.auditKind === "control" ? "control" : "tasks";
+        render();
+        return;
+      }
+      if (!t.responsibleBitrixId) return toast("Для помещения ещё не сопоставлен ответственный в Битрикс24");
+      toast("Создаём задачу ответственному в Битрикс24...");
+      try {
+        const result = await createBitrixTask(t, {
+          comment: "Устранить замечания, выявленные во время аудита 5С.",
+          issues,
+          photos: (t.files || []).filter(photo => photo.base64),
+          chief: session
+        });
+        t.status = "actioned";
+        t.returnComment = `Задача создана автоматически по результатам контрольного обхода: ${session.name}.`;
+        t.bitrixTask = result.task;
+        persist();
+        await persistSharedTask(t);
+        toast(`Задача Битрикс24 №${result.task.id} создана`);
+        view = t.auditKind === "control" ? "control" : "tasks";
+        render();
+      } catch (error) {
+        toast(error.message);
+      }
+    }
+    async function completeAuditWithoutIssues(id) {
+      const t = task(id);
+      if (!t || !isDirectAudit(t)) return;
+      t.answers = fullAnswers(50);
+      t.score = 50;
+      t.status = "accepted";
+      t.acceptedBy = session.id;
+      t.acceptedAt = new Date().toISOString();
+      quickAuditPrompt = false;
+      persist();
+      try {
+        await persistSharedTask(t);
+        toast("Аудит завершён без замечаний");
+        view = t.auditKind === "control" ? "control" : "tasks";
+        render();
+      } catch (error) {
+        t.status = "todo";
+        t.acceptedBy = null;
+        t.acceptedAt = null;
+        t.answers = {};
+        persist();
+        toast(`Общая база: ${error.message}`);
+      }
+    }
+    async function acceptTask(id) {
+      const t = task(id);
+      t.status = "accepted";
+      t.acceptedBy = session.id;
+      t.acceptedAt = new Date().toISOString();
+      persist();
+      try { await persistSharedTask(t); } catch (error) { return toast(`Общая база: ${error.message}`); }
+      toast("Проверка принята");
+      render();
+    }
+    function openReturnModal(id) {
+      const t = task(id);
+      if (!t.responsibleBitrixId) return toast("Для помещения ещё не сопоставлен ответственный в Битрикс24");
+      returnPhotos = [];
+      const wrap = document.createElement("div");
+      wrap.className = "modal-backdrop";
+      wrap.id = "returnModal";
+      wrap.innerHTML = `<div class="modal"><h3>Создать задачу в Битрикс24</h3><p>${esc(t.room)} · ${esc(t.number)}. Замечания аудита попадут в описание задачи. Повторная проверка не потребуется.</p><textarea id="returnText" placeholder="Что нужно исправить?"></textarea><p><b>Фото к задаче</b><br>Можно использовать фото аудитора и добавить до 5 новых снимков.</p><input class="file-input" type="file" accept="image/*" multiple onchange="rememberReturnFiles(this.files)"><p id="returnPhotoCount">Фото главного аудитора не добавлены</p><div class="modal-actions"><button class="ghost-btn" onclick="closeModal()">Отмена</button><button id="returnSubmit" class="danger-btn" onclick="returnTask('${id}')">Создать задачу</button></div></div>`;
+      document.body.appendChild(wrap);
+      document.getElementById("returnText").focus();
+    }
+    function closeModal() { document.getElementById("returnModal")?.remove(); }
+    async function createBitrixTask(t, { comment, issues, photos, chief }) {
+      const cloudEndpoint = `${SUPABASE_CONFIG.url}/functions/v1/bitrix-task`;
+      const endpoint = sharedMode ? cloudEndpoint : "/api/bitrix/tasks";
+      const headers = { "Content-Type": "application/json" };
+      if (sharedMode) {
+        headers.apikey = SUPABASE_CONFIG.publishableKey;
+        headers.Authorization = `Bearer ${supabaseSession.access_token}`;
+      }
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          roomId: t.sourceRoomId,
+          room: t.room,
+          number: t.number,
+          comment,
+          issues,
+          photos,
+          responsibleBitrixId: t.responsibleBitrixId,
+          responsibleName: t.responsibleName || user(t.auditorId).name,
+          chiefBitrixId: chief.bitrixId,
+          chiefName: chief.name
+        })
+      });
+      const result = await response.json();
+      if (!response.ok || !result.ok) throw new Error(result.message || "Не удалось создать задачу");
+      return result;
+    }
+    async function returnTask(id) {
+      const comment = document.getElementById("returnText").value.trim();
+      if (!comment) return toast("Укажите, что нужно исправить");
+      const t = task(id);
+      const chief = user(session.id);
+      const submit = document.getElementById("returnSubmit");
+      submit.disabled = true;
+      submit.textContent = "Создаём...";
+      try {
+        const result = await createBitrixTask(t, {
+          comment,
+          issues: issueList(t),
+          photos: [...(t.files || []).filter(photo => photo.base64), ...returnPhotos],
+          chief
+        });
+        t.status = "actioned";
+        t.returnComment = comment;
+        t.bitrixTask = result.task;
+        persist();
+        await persistSharedTask(t);
+        closeModal();
+        toast(`Задача Битрикс24 №${result.task.id} создана`);
+        render();
+      } catch (error) {
+        submit.disabled = false;
+        submit.textContent = "Создать задачу";
+        toast(error.message);
+      }
+    }
+    async function toggleChief(id) {
+      const u = user(id);
+      if (u.role === "chief" && state.rooms.some(room => room.chiefId === id)) {
+        return toast("Сначала назначьте помещения другому главному аудитору");
+      }
+      u.role = u.role === "chief" ? "auditor" : "chief";
+      persist();
+      try {
+        if (sharedMode) await supabaseRequest(`staff_members?id=eq.${encodeURIComponent(u.id)}`, { method: "PATCH", body: { role: u.role } });
+      } catch (error) {
+        toast(`Не удалось сохранить роль: ${error.message}`);
+        return;
+      }
+      toast(u.role === "chief" ? "Назначен главный аудитор" : "Роль главного аудитора снята");
+      render();
+    }
+    async function issueSharedCode(id) {
+      if (!sharedMode || session?.role !== "admin") return;
+      try {
+        const result = await callStaffCodeAuth({ action: "issue", staffId: id }, supabaseSession.access_token);
+        showIssuedCode(user(id), result.code);
+      } catch (error) {
+        toast(error.message);
+      }
+    }
+    async function disableSharedCode(id) {
+      if (!sharedMode || session?.role !== "admin") return;
+      if (!confirm(`Отключить рабочий код для сотрудника «${user(id)?.name || id}»?`)) return;
+      try {
+        await callStaffCodeAuth({ action: "disable", staffId: id }, supabaseSession.access_token);
+        toast("Рабочий код отключён");
+      } catch (error) {
+        toast(error.message);
+      }
+    }
+    function showIssuedCode(person, code) {
+      const wrap = document.createElement("div");
+      wrap.className = "modal-backdrop";
+      wrap.id = "accessCodeModal";
+      wrap.innerHTML = `<div class="modal"><h3>Новый персональный код</h3><p><b>${esc(person.name)}</b><br>Передайте код сотруднику лично. После закрытия окна сайт больше не покажет его полностью.</p><div class="issued-code" id="issuedCode">${esc(code)}</div><div class="modal-actions"><button class="secondary-btn" onclick="copyIssuedCode()">Скопировать</button><button class="primary-btn" onclick="closeAccessCodeModal()">Готово</button></div></div>`;
+      document.body.appendChild(wrap);
+    }
+    async function copyIssuedCode() {
+      const code = document.getElementById("issuedCode")?.textContent || "";
+      try {
+        await navigator.clipboard.writeText(code);
+        toast("Код скопирован");
+      } catch (_) {
+        toast("Выделите код и скопируйте вручную");
+      }
+    }
+    function closeAccessCodeModal() { document.getElementById("accessCodeModal")?.remove(); }
+    function auditResult(roomId, auditorId, periodKey, auditKind) {
+      const saved = auditHistory.find(row => row.room_id === roomId && row.auditor_staff_id === auditorId && row.period_key === periodKey && (row.audit_kind || "route") === auditKind);
+      if (saved) return saved;
+      const current = state.tasks.find(t => t.sourceRoomId === roomId && t.auditorId === auditorId && t.periodKey === periodKey && (t.auditKind || "route") === auditKind);
+      if (!current) return null;
+      return { ...current, score: Object.keys(current.answers || {}).length ? taskScore(current) : null };
+    }
+    function controlResult(roomId, periodKey) {
+      const saved = auditHistory.filter(row => row.room_id === roomId && row.period_key === periodKey && row.audit_kind === "control");
+      const current = state.tasks.filter(t => t.sourceRoomId === roomId && t.periodKey === periodKey && t.auditKind === "control");
+      return [...current, ...saved].find(row => ["accepted", "actioned"].includes(row.status)) || null;
+    }
+    function scoreOrNull(result) {
+      if (!result || !["accepted", "actioned", "review"].includes(result.status)) return null;
+      const score = Number(result.score);
+      return Number.isFinite(score) ? score : null;
+    }
+    function matchingPercent(routeScore, controlScore) {
+      if (!Number.isFinite(routeScore) || !Number.isFinite(controlScore)) return null;
+      if (routeScore === 0 && controlScore === 0) return 100;
+      if (routeScore === 0) return null;
+      return Math.round(controlScore / routeScore * 100);
+    }
+    function buildComparisonRows() {
+      return state.rooms.flatMap(room => roomAuditorIds(room).flatMap(auditorId => {
+        const periods = recentPeriodKeys(room.periodicity, isWeekly(room.periodicity) ? 3 : 1);
+        return periods.map(periodKey => {
+          const route = auditResult(room.id, auditorId, periodKey, "route");
+          const control = controlResult(room.id, periodKey);
+          const routeScore = scoreOrNull(route);
+          const controlScore = scoreOrNull(control);
+          const isCurrent = periodKey === scheduleFor(room.periodicity).periodKey;
+          const missed = !isCurrent && !["accepted", "actioned"].includes(route?.status);
+          return {
+            room,
+            auditorId,
+            periodKey,
+            route,
+            control,
+            routeScore,
+            controlScore,
+            controlAuditor: control ? user(control.auditor_staff_id || control.auditorId)?.name || "" : "",
+            missed,
+            routeStatus: missed ? "Не пройден" : route ? statusInfo(route.status)[1] : "Запланировано",
+            matchPercent: matchingPercent(routeScore, controlScore)
+          };
+        });
+      }));
+    }
+    const REPORT_MONTHS = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+    function weekAnchor(date) {
+      const result = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12);
+      result.setDate(result.getDate() + 3 - ((result.getDay() + 6) % 7));
+      return result;
+    }
+    function weekStart(periodKey) {
+      const match = /^(\d{4})-W(\d{2})$/.exec(periodKey);
+      if (!match) return null;
+      const year = Number(match[1]);
+      const week = Number(match[2]);
+      const jan4 = new Date(year, 0, 4, 12);
+      jan4.setDate(jan4.getDate() - ((jan4.getDay() + 6) % 7) + (week - 1) * 7);
+      return jan4;
+    }
+    function weekLabel(periodKey) {
+      const start = weekStart(periodKey);
+      if (!start) return periodKey;
+      const end = new Date(start);
+      end.setDate(end.getDate() + 6);
+      return `${formatShortDate(start)}–${formatShortDate(end)}`;
+    }
+    function monthWeekKeys(year, monthIndex) {
+      const keys = [];
+      const lastDay = new Date(year, monthIndex + 1, 0).getDate();
+      for (let day = 1; day <= lastDay; day++) {
+        const date = new Date(year, monthIndex, day, 12);
+        const anchor = weekAnchor(date);
+        const key = weekPeriodKey(date);
+        if (anchor.getFullYear() === year && anchor.getMonth() === monthIndex && !keys.includes(key)) keys.push(key);
+      }
+      return keys;
+    }
+    function reportPeriod(room, auditorId, periodKey) {
+      const route = auditResult(room.id, auditorId, periodKey, "route");
+      const control = controlResult(room.id, periodKey);
+      const routeScore = scoreOrNull(route);
+      const controlScore = scoreOrNull(control);
+      const currentKey = isWeekly(room.periodicity) ? weekPeriodKey() : monthPeriodKey();
+      const missed = periodKey < currentKey && routeScore === null;
+      const planned = periodKey >= currentKey && routeScore === null;
+      const notes = [...Object.values(route?.answers || {}), ...Object.values(control?.answers || {})]
+        .map(answer => answer.note)
+        .filter(Boolean)
+        .join(" | ");
+      return {
+        routeScore,
+        controlScore,
+        controlAuditor: control ? user(control.auditor_staff_id || control.auditorId)?.name || "" : "",
+        kpi: matchingPercent(routeScore, controlScore),
+        routeValue: routeScore ?? (missed ? "Не пройден" : planned ? "Запланировано" : ""),
+        missed,
+        notes
+      };
+    }
+    function reportRowsForMonth(year, monthIndex) {
+      const weeks = monthWeekKeys(year, monthIndex);
+      const monthKey = `${year}-${pad2(monthIndex + 1)}`;
+      const rows = [];
+      state.rooms.forEach(room => roomAuditorIds(room).forEach(auditorId => {
+        const base = [
+          room.name,
+          room.number || room.sourceObject,
+          room.checklist,
+          periodicityLabel(room.periodicity),
+          user(auditorId)?.name || auditorId
+        ];
+        const weeklyCells = [];
+        let monthlyCells = ["", "", ""];
+        let missed = 0;
+        const notes = [];
+        if (isWeekly(room.periodicity)) {
+          weeks.forEach(periodKey => {
+            const result = reportPeriod(room, auditorId, periodKey);
+            weeklyCells.push(result.routeValue, result.controlScore ?? "", result.kpi ?? "");
+            if (result.missed) missed++;
+            if (result.notes) notes.push(result.notes);
+          });
+        } else {
+          weeks.forEach(() => weeklyCells.push("", "", ""));
+          const result = reportPeriod(room, auditorId, monthKey);
+          monthlyCells = [result.routeValue, result.controlScore ?? "", result.kpi ?? ""];
+          if (result.missed) missed++;
+          if (result.notes) notes.push(result.notes);
+        }
+        rows.push([...base, ...weeklyCells, ...monthlyCells, missed || "", notes.join(" | ")]);
+      }));
+      return { weeks, rows };
+    }
+    function sheetFromRows(rows, widths, merges = []) {
+      const sheet = XLSX.utils.aoa_to_sheet(rows);
+      sheet["!cols"] = widths.map(width => ({ wch: width }));
+      sheet["!merges"] = merges;
+      if (rows.length > 3) sheet["!autofilter"] = { ref: XLSX.utils.encode_range({ s: { r: 2, c: 0 }, e: { r: rows.length - 1, c: rows[2].length - 1 } }) };
+      return sheet;
+    }
+    function annualSummaryRows(year) {
+      const headers = ["Помещение", "Номер", "Тип", "Периодичность", "Аудитор", ...REPORT_MONTHS, "Средний балл за год", "Средняя контрольная оценка", "Средний КПЭ, %", "Пропуски"];
+      const rows = [[`Годовая сводка аудитов 5С за ${year} год`], [], headers];
+      state.rooms.forEach(room => roomAuditorIds(room).forEach(auditorId => {
+        const monthCells = [];
+        const routeScores = [];
+        const controlScores = [];
+        const kpis = [];
+        let missed = 0;
+        REPORT_MONTHS.forEach((_, monthIndex) => {
+          const keys = isWeekly(room.periodicity) ? monthWeekKeys(year, monthIndex) : [`${year}-${pad2(monthIndex + 1)}`];
+          const results = keys.map(periodKey => reportPeriod(room, auditorId, periodKey));
+          const scores = results.map(result => result.routeScore).filter(Number.isFinite);
+          const monthMissed = results.filter(result => result.missed).length;
+          const avg = scores.length ? Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length * 10) / 10 : null;
+          monthCells.push(avg ?? (monthMissed ? "Не пройден" : "—"));
+          routeScores.push(...scores);
+          controlScores.push(...results.map(result => result.controlScore).filter(Number.isFinite));
+          kpis.push(...results.map(result => result.kpi).filter(Number.isFinite));
+          missed += monthMissed;
+        });
+        const avg = values => values.length ? Math.round(values.reduce((sum, value) => sum + value, 0) / values.length * 10) / 10 : "";
+        rows.push([
+          room.name,
+          room.number || room.sourceObject,
+          room.checklist,
+          periodicityLabel(room.periodicity),
+          user(auditorId)?.name || auditorId,
+          ...monthCells,
+          avg(routeScores),
+          avg(controlScores),
+          avg(kpis),
+          missed || ""
+        ]);
+      }));
+      return rows;
+    }
+    function exportYearExcel() {
+      if (typeof XLSX === "undefined") return toast("Не удалось загрузить модуль Excel. Проверьте интернет и повторите попытку");
+      const year = SCHEDULE_NOW.getFullYear();
+      const workbook = XLSX.utils.book_new();
+      const annual = annualSummaryRows(year);
+      XLSX.utils.book_append_sheet(workbook, sheetFromRows(annual, [34, 14, 24, 16, 30, ...REPORT_MONTHS.map(() => 13), 18, 24, 16, 12]), "Годовая сводка");
+      REPORT_MONTHS.forEach((month, monthIndex) => {
+        const { weeks, rows } = reportRowsForMonth(year, monthIndex);
+        const header = ["Помещение", "Номер", "Тип", "Периодичность", "Аудитор"];
+        weeks.forEach((periodKey, index) => header.push(`Неделя ${index + 1}: аудитор\n${weekLabel(periodKey)}`, `Неделя ${index + 1}: контроль`, `Неделя ${index + 1}: КПЭ, %`));
+        header.push("За месяц: аудитор", "За месяц: контроль", "За месяц: КПЭ, %", "Пропуски", "Замечания");
+        const title = [`${month} ${year}: оценки по неделям и пропуски`];
+        const sheetRows = [title, [], header, ...rows];
+        const widths = [34, 14, 24, 16, 30, ...weeks.flatMap(() => [20, 18, 14]), 18, 18, 14, 10, 54];
+        XLSX.utils.book_append_sheet(workbook, sheetFromRows(sheetRows, widths), month);
+      });
+      XLSX.writeFile(workbook, `Аудиты_5С_${year}.xlsx`);
+      toast(`Годовой отчёт за ${year} год выгружен`);
+    }
+
+    render();
+    restoreSharedSession();
+  </script>
+</body>
+</html>
