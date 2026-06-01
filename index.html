@@ -1006,8 +1006,11 @@
         ...extra
       };
     }
+    function supabaseApiUrl() {
+      return String(SUPABASE_CONFIG.apiUrl || SUPABASE_CONFIG.url).replace(/\/+$/, "");
+    }
     async function supabaseRequest(path, options = {}) {
-      const response = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/${path}`, {
+      const response = await fetch(`${supabaseApiUrl()}/rest/v1/${path}`, {
         method: options.method || "GET",
         headers: supabaseHeaders(options.prefer ? { Prefer: options.prefer } : {}),
         body: options.body === undefined ? undefined : JSON.stringify(options.body)
@@ -1020,7 +1023,7 @@
     async function callStaffCodeAuth(body, token = SUPABASE_CONFIG.publishableKey) {
       let response;
       try {
-        response = await fetch(`${SUPABASE_CONFIG.url}/functions/v1/staff-code-auth`, {
+        response = await fetch(`${supabaseApiUrl()}/functions/v1/staff-code-auth`, {
           method: "POST",
           headers: {
             apikey: SUPABASE_CONFIG.publishableKey,
@@ -1042,7 +1045,7 @@
     async function callSharedFunction(name, body) {
       let response;
       try {
-        response = await fetch(`${SUPABASE_CONFIG.url}/functions/v1/${name}`, {
+        response = await fetch(`${supabaseApiUrl()}/functions/v1/${name}`, {
           method: "POST",
           headers: {
             apikey: SUPABASE_CONFIG.publishableKey,
@@ -1150,7 +1153,7 @@
     }
     async function refreshSupabaseSession() {
       if (!supabaseSession?.refresh_token) throw new Error("Нет данных для обновления сессии");
-      const response = await fetch(`${SUPABASE_CONFIG.url}/auth/v1/token?grant_type=refresh_token`, {
+      const response = await fetch(`${supabaseApiUrl()}/auth/v1/token?grant_type=refresh_token`, {
         method: "POST",
         headers: { apikey: SUPABASE_CONFIG.publishableKey, "Content-Type": "application/json" },
         body: JSON.stringify({ refresh_token: supabaseSession.refresh_token })
@@ -1163,7 +1166,7 @@
     async function restoreSharedSession() {
       if (!supabaseSession?.access_token) return;
       try {
-        const response = await fetch(`${SUPABASE_CONFIG.url}/auth/v1/user`, { headers: supabaseHeaders() });
+        const response = await fetch(`${supabaseApiUrl()}/auth/v1/user`, { headers: supabaseHeaders() });
         const authUser = response.ok ? await response.json() : (await refreshSupabaseSession()).user;
         await loadSharedState(authUser);
         render();
@@ -1876,7 +1879,7 @@
       const errorBox = document.getElementById("sharedLoginError");
       errorBox.innerHTML = "";
       try {
-        const response = await fetch(`${SUPABASE_CONFIG.url}/auth/v1/token?grant_type=password`, {
+        const response = await fetch(`${supabaseApiUrl()}/auth/v1/token?grant_type=password`, {
           method: "POST",
           headers: { apikey: SUPABASE_CONFIG.publishableKey, "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -1913,7 +1916,7 @@
     }
     async function logout() {
       if (sharedMode && supabaseSession?.access_token) {
-        fetch(`${SUPABASE_CONFIG.url}/auth/v1/logout`, { method: "POST", headers: supabaseHeaders() }).catch(() => {});
+        fetch(`${supabaseApiUrl()}/auth/v1/logout`, { method: "POST", headers: supabaseHeaders() }).catch(() => {});
       }
       saveSupabaseSession(null);
       sharedMode = false;
@@ -2278,7 +2281,7 @@
     }
     function closeModal() { document.getElementById("returnModal")?.remove(); }
     async function createBitrixTask(t, { comment, issues, photos, chief }) {
-      const cloudEndpoint = `${SUPABASE_CONFIG.url}/functions/v1/bitrix-task`;
+      const cloudEndpoint = `${supabaseApiUrl()}/functions/v1/bitrix-task`;
       const endpoint = sharedMode ? cloudEndpoint : "/api/bitrix/tasks";
       const headers = { "Content-Type": "application/json" };
       if (sharedMode) {
