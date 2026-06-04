@@ -1115,7 +1115,7 @@ const roomRows = await supabaseRequestRetry("rooms?select=id,source_row,source_o
 const assignmentRows = await supabaseRequestRetry("room_auditors?select=room_id,auditor_staff_id,is_required");
 const auditRows = await supabaseRequestRetry("audits?select=id,client_ref,period_key,room_id,auditor_staff_id,audit_kind,status,score,return_comment,bitrix_task_id,accepted_at,submitted_at,created_at&order=created_at.desc");
 const answerRows = await supabaseRequestRetry("audit_answers?select=audit_id,question_key,score,note");
-      ]);
+     
       const assignments = new Map();
       assignmentRows.forEach(row => {
         // Ignore routes created by the old rule that assigned Sapronov to every room.
