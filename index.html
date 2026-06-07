@@ -1009,7 +1009,7 @@
     function supabaseApiUrl() {
       return String(SUPABASE_CONFIG.apiUrl || SUPABASE_CONFIG.url).replace(/\/+$/, "");
     }
-  async function supabaseRequest(path, options = {}) {
+    async function supabaseRequest(path, options = {}) {
       const response = await fetch(`${supabaseApiUrl()}/rest/v1/${path}`, {
         method: options.method || "GET",
         headers: supabaseHeaders(options.prefer ? { Prefer: options.prefer } : {}),
@@ -1019,18 +1019,6 @@
       const data = text ? JSON.parse(text) : null;
       if (!response.ok) throw new Error(data?.message || data?.error_description || "Ошибка общей базы");
       return data;
-    }
-    async function supabaseRequestRetry(path, options = {}, tries = 4) {
-      let lastError;
-      for (let attempt = 1; attempt <= tries; attempt++) {
-        try {
-          return await supabaseRequest(path, options);
-        } catch (error) {
-          lastError = error;
-          await new Promise(r => setTimeout(r, 400 * 2 ** (attempt - 1)));
-        }
-      }
-      throw lastError;
     }
     async function callStaffCodeAuth(body, token = SUPABASE_CONFIG.publishableKey) {
       let response;
@@ -1110,12 +1098,13 @@
       const profileRows = await supabaseRequest(`profiles?user_id=eq.${encodeURIComponent(authUser.id)}&select=staff_id,is_active`);
       const profile = profileRows?.[0];
       if (!profile?.is_active) throw new Error("Учётная запись не привязана к сотруднику");
-      const staffRows = await supabaseRequestRetry("staff_members?select=id,bitrix_id,full_name,department,role,oversee_all,is_active&is_active=eq.true");
-const roomRows = await supabaseRequestRetry("rooms?select=id,source_row,source_object,number,name,checklist,periodicity,responsible_name,responsible_bitrix_id,chief_staff_id,issues&order=source_row.asc");
-const assignmentRows = await supabaseRequestRetry("room_auditors?select=room_id,auditor_staff_id,is_required");
-const auditRows = await supabaseRequestRetry("audits?select=id,client_ref,period_key,room_id,auditor_staff_id,audit_kind,status,score,return_comment,bitrix_task_id,accepted_at,submitted_at,created_at&order=created_at.desc");
-const answerRows = await supabaseRequestRetry("audit_answers?select=audit_id,question_key,score,note");
-     
+      const [staffRows, roomRows, assignmentRows, auditRows, answerRows] = await Promise.all([
+        supabaseRequest("staff_members?select=id,bitrix_id,full_name,department,role,oversee_all,is_active&is_active=eq.true"),
+        supabaseRequest("rooms?select=id,source_row,source_object,number,name,checklist,periodicity,responsible_name,responsible_bitrix_id,chief_staff_id,issues&order=source_row.asc"),
+        supabaseRequest("room_auditors?select=room_id,auditor_staff_id,is_required"),
+        supabaseRequest("audits?select=id,client_ref,period_key,room_id,auditor_staff_id,audit_kind,status,score,return_comment,bitrix_task_id,accepted_at,submitted_at,created_at&order=created_at.desc"),
+        supabaseRequest("audit_answers?select=audit_id,question_key,score,note")
+      ]);
       const assignments = new Map();
       assignmentRows.forEach(row => {
         // Ignore routes created by the old rule that assigned Sapronov to every room.
@@ -2277,28 +2266,23 @@ const answerRows = await supabaseRequestRetry("audit_answers?select=audit_id,que
     }
     function closeModal() { document.getElementById("returnModal")?.remove(); }
     async function createBitrixTask(t, { comment, issues, photos, chief }) {
-      const cloudEndpoint = `${supabaseApiUrl()}/functions/v1/bitrix-task`;
-      const endpoint = sharedMode ? cloudEndpoint : "/api/bitrix/tasks";
-      const headers = { "Content-Type": "application/json" };
-      if (sharedMode) {
-        headers.apikey = SUPABASE_CONFIG.publishableKey;
-        headers.Authorization = `Bearer ${supabaseSession.access_token}`;
-      }
-      const response = await fetch(endpoint, {
+      const payload = {
+        roomId: t.sourceRoomId,
+        room: t.room,
+        number: t.number,
+        comment,
+        issues,
+        photos,
+        responsibleBitrixId: t.responsibleBitrixId,
+        responsibleName: t.responsibleName || user(t.auditorId).name,
+        chiefBitrixId: chief.bitrixId,
+        chiefName: chief.name
+      };
+      if (supabaseSession?.access_token) return callSharedFunction("bitrix-task", payload);
+      const response = await fetch("/api/bitrix/tasks", {
         method: "POST",
-        headers,
-        body: JSON.stringify({
-          roomId: t.sourceRoomId,
-          room: t.room,
-          number: t.number,
-          comment,
-          issues,
-          photos,
-          responsibleBitrixId: t.responsibleBitrixId,
-          responsibleName: t.responsibleName || user(t.auditorId).name,
-          chiefBitrixId: chief.bitrixId,
-          chiefName: chief.name
-        })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
       });
       const result = await response.json();
       if (!response.ok || !result.ok) throw new Error(result.message || "Не удалось создать задачу");
