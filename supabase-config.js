@@ -1,7 +1,6 @@
 // Safe to expose in the browser when Row Level Security is enabled.
 const SUPABASE_CONFIG = Object.freeze({
-  url: "https://cvaeztimgfdllcwbzxmk.supabase.co",
-  // Optional Cloudflare Worker proxy for networks where *.supabase.co is unavailable.
-  apiUrl: "https://api.steel-5s.online",
-  publishableKey: "sb_publishable_2ugrqwNDSugXvGY8T3Dthw_0mWvg60u"
+  url: "https://api.steel-5-s.ru",
+  apiUrl: "",
+  publishableKey: "sb_publishable_xez1C8N6ceWQTGeM9sUDSC_MSd9nBJz"
 });
