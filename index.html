@@ -2457,6 +2457,7 @@
       const control = controlResult(room.id, periodKey);
       const routeScore = scoreOrNull(route);
       const controlScore = scoreOrNull(control);
+      const controlAuditor = control ? user(control.auditor_staff_id || control.auditorId)?.name || "" : "";
       const currentKey = isWeekly(room.periodicity) ? weekPeriodKey() : monthPeriodKey();
       const missed = periodKey < currentKey && routeScore === null;
       const planned = periodKey >= currentKey && routeScore === null;
@@ -2467,7 +2468,8 @@
       return {
         routeScore,
         controlScore,
-        controlAuditor: control ? user(control.auditor_staff_id || control.auditorId)?.name || "" : "",
+        controlAuditor,
+        controlValue: Number.isFinite(controlScore) ? `${controlScore}${controlAuditor ? ` — ${controlAuditor.split(" ")[0]}` : ""}` : "",
         kpi: matchingPercent(routeScore, controlScore),
         routeValue: routeScore ?? (missed ? "Не пройден" : planned ? "Запланировано" : ""),
         missed,
@@ -2493,14 +2495,14 @@
         if (isWeekly(room.periodicity)) {
           weeks.forEach(periodKey => {
             const result = reportPeriod(room, auditorId, periodKey);
-            weeklyCells.push(result.routeValue, result.controlScore ?? "", result.kpi ?? "");
+            weeklyCells.push(result.routeValue, result.controlValue, result.kpi ?? "");
             if (result.missed) missed++;
             if (result.notes) notes.push(result.notes);
           });
         } else {
           weeks.forEach(() => weeklyCells.push("", "", ""));
           const result = reportPeriod(room, auditorId, monthKey);
-          monthlyCells = [result.routeValue, result.controlScore ?? "", result.kpi ?? ""];
+          monthlyCells = [result.routeValue, result.controlValue, result.kpi ?? ""];
           if (result.missed) missed++;
           if (result.notes) notes.push(result.notes);
         }
