@@ -2469,7 +2469,7 @@
         routeScore,
         controlScore,
         controlAuditor,
-        controlValue: Number.isFinite(controlScore) ? `${controlScore}${controlAuditor ? ` — ${controlAuditor.split(" ")[0]}` : ""}` : "",
+        controlValue: Number.isFinite(controlScore) ? `${controlScore}${controlAuditor ? ` - ${controlAuditor.split(" ")[0]}` : ""}` : "",
         kpi: matchingPercent(routeScore, controlScore),
         routeValue: routeScore ?? (missed ? "Не пройден" : planned ? "Запланировано" : ""),
         missed,
@@ -2665,3 +2665,4 @@
   </script>
 </body>
 </html>
+
