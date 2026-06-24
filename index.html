@@ -1708,7 +1708,7 @@
       return session?.id === "u2" && t.auditorId === "u2";
     }
     function isDirectAudit(t) {
-      return t.auditKind === "control" || isSapronovOwnAudit(t);
+return true;
     }
 
     function renderReview() {
@@ -2507,11 +2507,16 @@
       }));
       return { weeks, rows };
     }
-    function sheetFromRows(rows, widths, merges = []) {
+    function sheetFromRows(rows, widths, merges = [], colors = []) {
       const sheet = XLSX.utils.aoa_to_sheet(rows);
       sheet["!cols"] = widths.map(width => ({ wch: width }));
       sheet["!merges"] = merges;
       if (rows.length > 3) sheet["!autofilter"] = { ref: XLSX.utils.encode_range({ s: { r: 2, c: 0 }, e: { r: rows.length - 1, c: rows[2].length - 1 } }) };
+      (colors || []).forEach(({ r, c, rgb }) => {
+        const ref = XLSX.utils.encode_cell({ r, c });
+        if (!sheet[ref]) sheet[ref] = { t: "s", v: "" };
+        sheet[ref].s = { fill: { patternType: "solid", fgColor: { rgb } } };
+      });
       return sheet;
     }
     function annualSummaryRows(year) {
@@ -2565,7 +2570,21 @@
         const title = [`${month} ${year}: оценки по неделям и пропуски`];
         const sheetRows = [title, [], header, ...rows];
         const widths = [34, 14, 24, 16, 30, ...weeks.flatMap(() => [20, 18, 14]), 18, 18, 14, 10, 54];
-        XLSX.utils.book_append_sheet(workbook, sheetFromRows(sheetRows, widths), month);
+        const colors = [];
+        const dataStartRow = 3;
+        weeks.forEach((_, index) => {
+          const base = 5 + index * 3;
+          rows.forEach((_, ri) => {
+            colors.push({ r: dataStartRow + ri, c: base, rgb: "FFE2F0D9" });
+            colors.push({ r: dataStartRow + ri, c: base + 1, rgb: "FFDEEBF7" });
+          });
+        });
+        const monthBase = 5 + weeks.length * 3;
+        rows.forEach((_, ri) => {
+          colors.push({ r: dataStartRow + ri, c: monthBase, rgb: "FFE2F0D9" });
+          colors.push({ r: dataStartRow + ri, c: monthBase + 1, rgb: "FFDEEBF7" });
+        });
+        XLSX.utils.book_append_sheet(workbook, sheetFromRows(sheetRows, widths, [], colors), month);
       });
       XLSX.writeFile(workbook, `Аудиты_5С_${year}.xlsx`);
       toast(`Годовой отчёт за ${year} год выгружен`);
