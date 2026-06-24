@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>СТИЛ 5С - Аудиты</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
   <style>
     :root {
       --ink: #15251f;
@@ -1708,7 +1709,7 @@
       return session?.id === "u2" && t.auditorId === "u2";
     }
     function isDirectAudit(t) {
-return true;
+      return true;
     }
 
     function renderReview() {
@@ -2556,12 +2557,82 @@ return true;
       }));
       return rows;
     }
-    function exportYearExcel() {
-      if (typeof XLSX === "undefined") return toast("Не удалось загрузить модуль Excel. Проверьте интернет и повторите попытку");
+    const EXCEL_AUDITOR_FILL = { type: "pattern", pattern: "solid", fgColor: { argb: "FFE2F0D9" } };
+    const EXCEL_CONTROL_FILL = { type: "pattern", pattern: "solid", fgColor: { argb: "FFDDEBF7" } };
+    const EXCEL_KPI_FILL = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFFF2CC" } };
+    function styleExcelSheet(sheet, widths, colorColumns = []) {
+      sheet.columns = widths.map(width => ({ width }));
+      sheet.views = [{ state: "frozen", ySplit: 3 }];
+      const title = sheet.getCell(1, 1);
+      title.font = { bold: true, size: 14, color: { argb: "FF0F3F2C" } };
+      const header = sheet.getRow(3);
+      header.height = 34;
+      header.font = { bold: true, color: { argb: "FF10241B" } };
+      header.alignment = { vertical: "middle", horizontal: "center", wrapText: true };
+      header.eachCell(cell => {
+        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF3F6F1" } };
+        cell.border = { bottom: { style: "thin", color: { argb: "FFD9E2DC" } } };
+      });
+      sheet.eachRow((row, rowNumber) => {
+        row.eachCell(cell => {
+          cell.alignment = { vertical: "top", wrapText: true };
+          if (rowNumber >= 4) {
+            cell.border = { bottom: { style: "hair", color: { argb: "FFE4ECE7" } } };
+          }
+        });
+      });
+      colorColumns.forEach(({ index, fill }) => {
+        const column = index + 1;
+        sheet.getCell(3, column).fill = fill;
+        for (let row = 4; row <= sheet.rowCount; row++) {
+          sheet.getCell(row, column).fill = fill;
+        }
+      });
+      if (sheet.rowCount >= 3) {
+        sheet.autoFilter = {
+          from: { row: 3, column: 1 },
+          to: { row: Math.max(3, sheet.rowCount), column: sheet.getRow(3).cellCount }
+        };
+      }
+    }
+    function addExcelSheet(workbook, name, rows, widths, colorColumns = []) {
+      const sheet = workbook.addWorksheet(name);
+      rows.forEach(row => sheet.addRow(row));
+      styleExcelSheet(sheet, widths, colorColumns);
+      return sheet;
+    }
+    async function downloadExcelWorkbook(workbook, filename) {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+    async function exportYearExcel() {
+      if (typeof ExcelJS === "undefined") return toast("Не удалось загрузить модуль Excel. Проверьте интернет и повторите попытку");
       const year = SCHEDULE_NOW.getFullYear();
-      const workbook = XLSX.utils.book_new();
+      const workbook = new ExcelJS.Workbook();
+      workbook.creator = "СТИЛ 5С";
+      workbook.created = new Date();
       const annual = annualSummaryRows(year);
-      XLSX.utils.book_append_sheet(workbook, sheetFromRows(annual, [34, 14, 24, 16, 30, ...REPORT_MONTHS.map(() => 13), 18, 24, 16, 12]), "Годовая сводка");
+      addExcelSheet(
+        workbook,
+        "Годовая сводка",
+        annual,
+        [34, 14, 24, 16, 30, ...REPORT_MONTHS.map(() => 13), 18, 24, 16, 12],
+        [
+          { index: 4, fill: EXCEL_AUDITOR_FILL },
+          ...REPORT_MONTHS.map((_, index) => ({ index: 5 + index, fill: EXCEL_AUDITOR_FILL })),
+          { index: 17, fill: EXCEL_AUDITOR_FILL },
+          { index: 18, fill: EXCEL_CONTROL_FILL },
+          { index: 19, fill: EXCEL_KPI_FILL }
+        ]
+      );
       REPORT_MONTHS.forEach((month, monthIndex) => {
         const { weeks, rows } = reportRowsForMonth(year, monthIndex);
         const header = ["Помещение", "Номер", "Тип", "Периодичность", "Аудитор"];
@@ -2570,23 +2641,20 @@ return true;
         const title = [`${month} ${year}: оценки по неделям и пропуски`];
         const sheetRows = [title, [], header, ...rows];
         const widths = [34, 14, 24, 16, 30, ...weeks.flatMap(() => [20, 18, 14]), 18, 18, 14, 10, 54];
-        const colors = [];
-        const dataStartRow = 3;
+        const colors = [{ index: 4, fill: EXCEL_AUDITOR_FILL }];
         weeks.forEach((_, index) => {
           const base = 5 + index * 3;
-          rows.forEach((_, ri) => {
-            colors.push({ r: dataStartRow + ri, c: base, rgb: "FFE2F0D9" });
-            colors.push({ r: dataStartRow + ri, c: base + 1, rgb: "FFDEEBF7" });
-          });
+          colors.push({ index: base, fill: EXCEL_AUDITOR_FILL });
+          colors.push({ index: base + 1, fill: EXCEL_CONTROL_FILL });
+          colors.push({ index: base + 2, fill: EXCEL_KPI_FILL });
         });
         const monthBase = 5 + weeks.length * 3;
-        rows.forEach((_, ri) => {
-          colors.push({ r: dataStartRow + ri, c: monthBase, rgb: "FFE2F0D9" });
-          colors.push({ r: dataStartRow + ri, c: monthBase + 1, rgb: "FFDEEBF7" });
-        });
-        XLSX.utils.book_append_sheet(workbook, sheetFromRows(sheetRows, widths, [], colors), month);
+        colors.push({ index: monthBase, fill: EXCEL_AUDITOR_FILL });
+        colors.push({ index: monthBase + 1, fill: EXCEL_CONTROL_FILL });
+        colors.push({ index: monthBase + 2, fill: EXCEL_KPI_FILL });
+        addExcelSheet(workbook, month, sheetRows, widths, colors);
       });
-      XLSX.writeFile(workbook, `Аудиты_5С_${year}.xlsx`);
+      await downloadExcelWorkbook(workbook, `Аудиты_5С_${year}.xlsx`);
       toast(`Годовой отчёт за ${year} год выгружен`);
     }
 
