@@ -735,18 +735,19 @@
   <script src="real-rooms.js"></script>
   <script src="supabase-config.js"></script>
   <script>
-    const S5 = [
+    const CHECKLISTS = {
+      "Производство и склад": [
       {
         key: "sort",
         title: "1С · Сортировка",
         short: "1С",
         description: "Убираем лишнее и оставляем только необходимое.",
         questions: [
-          "На рабочем месте отсутствуют ненужные, неисправные предметы.",
-          "На оборудовании, столах и шкафах отсутствуют посторонние предметы.",
-          "Определена зона красных ярлыков, сотрудники знают правила работы с ней.",
-          "Доступ к материалам, документации и рабочему оборудованию не затруднён.",
-          "Отсутствует неактуальная документация и устаревшая информация."
+          "На рабочем месте отсутствуют ненужные, неисправные предметы (инструмент, оснастка и др.).",
+          "На оборудовании и шкафах отсутствуют посторонние предметы.",
+          "Определена зона красных ярлыков, сотрудники знают где она находится и правила работы с ней.",
+          "Доступ к материалам и инструменту не затруднён.",
+          "Отсутствует неактуальная документация на рабочих местах и на участке в целом."
         ]
       },
       {
@@ -755,11 +756,11 @@
         short: "2С",
         description: "Проверяем места хранения, разметку и свободные проходы.",
         questions: [
-          "Все используемые предметы имеют постоянное место хранения.",
-          "Места хранения промаркированы, отсутствие предмета можно определить визуально.",
-          "Расположение предметов удобно для работы и соответствует схеме.",
-          "Проходы, рабочие зоны и доступ к средствам пожаротушения свободны.",
-          "Маршруты, зоны хранения и опасные участки обозначены."
+          "Все используемые предметы имеют своё постоянное местонахождение.",
+          "Места хранения предметов промаркированы. Возможно однозначно определить, что отсутствует на своём месте.",
+          "Рабочему удобно в процессе работы использовать предметы и передвигаться.",
+          "Способ хранения исключает смешивание годных и бракованных предметов.",
+          "Существует чёткая маркировка маршрутов и зон для палетт, материалов, мест хранения."
         ]
       },
       {
@@ -768,9 +769,9 @@
         short: "3С",
         description: "Осматриваем чистоту рабочих зон, оборудования и пола.",
         questions: [
-          "Средства для уборки имеются в наличии и доступны.",
-          "Оборудование, мебель и шкафчики находятся в чистоте.",
-          "Рабочие зоны, включая труднодоступные места, находятся в чистоте.",
+          "Средства для уборки имеются в наличии. Они доступны.",
+          "Оборудование чистое, графики чистки оборудования соблюдаются.",
+          "Рабочие зоны, производственная мебель, оснастка, комплектация, тара и места расположения предметов находятся в чистоте.",
           "Чистота поддерживается во время выполнения работ.",
           "Напольное покрытие и разметка находятся в чистоте."
         ]
@@ -781,11 +782,11 @@
         short: "4С",
         description: "Сверяем стандарты, схемы, графики и инструкции.",
         questions: [
-          "На рабочем месте размещён график уборки, он соблюдается.",
-          "Объекты рабочего места соответствуют утверждённой схеме.",
-          "Стандарт рабочего места актуален и соблюдается.",
-          "Документы, папки и зоны хранения обозначены.",
-          "Инструкции по охране труда и пожарной безопасности размещены и актуальны."
+          "На рабочем месте размещён график уборки рабочего места.",
+          "Объекты рабочего места соответствуют схеме. Разметка соблюдается.",
+          "На рабочем месте имеется стандарт рабочего места, он актуален.",
+          "На рабочем месте имеются стандартные операционные карты, правила выполнения операций понятны и доступны.",
+          "На рабочих местах размещены инструкции по ОТ, они актуальны и соблюдаются."
         ]
       },
       {
@@ -794,14 +795,218 @@
         short: "5С",
         description: "Фиксируем улучшения и работу с прошлыми замечаниями.",
         questions: [
-          "Информация о системе 5С и график аудита актуальны.",
-          "Сотрудники предлагают и внедряют улучшения рабочих мест.",
-          "Организован регулярный контроль поддержания системы 5С.",
-          "По предыдущему аудиту разработан и выполняется план мероприятий.",
-          "Размещены примеры улучшений «было — стало»."
+          "На участке размещён стенд с информацией о системе 5С, чек-лист мониторинга и график аудита актуальны.",
+          "Работники участка предлагают и внедряют мероприятия по совершенствованию рабочих мест.",
+          "Организована система еженедельного контроля поддержания системы 5С, результаты размещены на участке.",
+          "По результатам предыдущего аудита разработан план мероприятий, мероприятия внедрены.",
+          "На участке размещены примеры улучшений было-стало."
         ]
       }
-    ];
+      ],
+      "Офис": [
+        {
+          key: "sort",
+          title: "1С · Сортировка",
+          short: "1С",
+          description: "Проверяем рабочее место, документацию и доступ к оборудованию.",
+          questions: [
+            "На рабочем месте отсутствуют ненужные, неисправные предметы.",
+            "На столах и шкафах отсутствуют посторонние предметы.",
+            "Определена зона красных ярлыков, имеется журнал, в журнале нет записей без решения позднее 1 месяца.",
+            "Доступ к документации и рабочему оборудованию не затруднён.",
+            "Отсутствует неактуальная документация на рабочих местах."
+          ]
+        },
+        {
+          key: "order",
+          title: "2С · Соблюдение порядка",
+          short: "2С",
+          description: "Проверяем хранение, визуализацию и свободные проходы.",
+          questions: [
+            "Все предметы на стеллажах, в тумбочках и шкафах расположены и визуализированы так, что их легко брать и возвращать на место.",
+            "Определены, визуализированы и соблюдаются места хранения средств пожаротушения, имеется аптечка первой помощи.",
+            "Обозначены номера кабинетов, лица ответственные за соблюдение 5С и пожарной безопасности.",
+            "Проходы свободны.",
+            "Проходы к эвакуационным выходам не загромождены и визуализированы."
+          ]
+        },
+        {
+          key: "clean",
+          title: "3С · Содержание в чистоте",
+          short: "3С",
+          description: "Осматриваем порядок, чистоту рабочего места и техники.",
+          questions: [
+            "Наведён общий порядок, отсутствует мусор на столах и тумбочках.",
+            "Поддерживается чистота на рабочем месте во время выполнения работ.",
+            "Рабочие зоны, мебель и места расположения предметов находятся в чистоте.",
+            "Техника исправна, загрязнения отсутствуют.",
+            "Напольное покрытие находится в чистоте."
+          ]
+        },
+        {
+          key: "standard",
+          title: "4С · Стандартизация",
+          short: "4С",
+          description: "Сверяем стандарт 5С, схему, обозначения и знаки.",
+          questions: [
+            "На рабочем месте размещён график уборки рабочего места.",
+            "Имеется схема рабочего места, объекты рабочего места соответствуют схеме.",
+            "На рабочем месте имеется стандарт 5С, он актуален и соблюдается.",
+            "Документация, папки и зоны хранения обозначены.",
+            "На рабочих местах или в коридоре размещены знаки пожарной безопасности."
+          ]
+        },
+        {
+          key: "improve",
+          title: "5С · Совершенствование",
+          short: "5С",
+          description: "Проверяем мониторинг 5С, улучшения и работу с прошлыми замечаниями.",
+          questions: [
+            "Есть в наличии чек-лист мониторинга системы 5С, обходы проводятся, данные обрабатываются.",
+            "Работники предлагают и внедряют мероприятия по совершенствованию рабочих мест.",
+            "Организована система ежемесячного контроля поддержания системы 5С, результаты размещены на участке.",
+            "По результатам предыдущего аудита разработан план мероприятий, мероприятия внедрены.",
+            "Размещены примеры улучшений было-стало в кабинете."
+          ]
+        }
+      ],
+      "Прочие помещения": [
+        {
+          key: "sort",
+          title: "1С · Сортировка",
+          short: "1С",
+          description: "Проверяем отсутствие лишних предметов и актуальность информации.",
+          questions: [
+            "В помещении отсутствуют ненужные предметы.",
+            "На стеллажах, полочках и шкафчиках отсутствуют посторонние предметы.",
+            "Определена зона красных ярлыков, имеется журнал, в журнале нет записей без решения позднее 1 месяца.",
+            "Доступ к материалам, расходникам и прочему не затруднён.",
+            "Отсутствует неактуальная информация: листы уборки, таблички и т.д."
+          ]
+        },
+        {
+          key: "order",
+          title: "2С · Соблюдение порядка",
+          short: "2С",
+          description: "Проверяем доступность, хранение, схему и пожарную безопасность.",
+          questions: [
+            "Все предметы легко брать, труднодоступные места отсутствуют.",
+            "Определены, визуализированы и соблюдаются места хранения СИЗ, средств пожарной безопасности и хозинвентаря.",
+            "Все предметы расположены согласно схеме расстановки.",
+            "Имеется обозначение зон и мест хранения, шкафчики СИЗ подписаны.",
+            "Доступ к средствам пожаротушения не загромождён."
+          ]
+        },
+        {
+          key: "clean",
+          title: "3С · Содержание в чистоте",
+          short: "3С",
+          description: "Проверяем чистоту помещения, мебели и напольного покрытия.",
+          questions: [
+            "Средства для уборки имеются в наличии. Они доступны.",
+            "Стеллажи для хранения, шкафчики для посуды и шкафчики СИЗ находятся в чистоте.",
+            "Рабочие зоны и мебель находятся в чистоте.",
+            "В наличии ведра для мусора, они не переполнены.",
+            "Напольное покрытие находится в чистоте."
+          ]
+        },
+        {
+          key: "standard",
+          title: "4С · Стандартизация",
+          short: "4С",
+          description: "Сверяем график уборки, схему, стандарт и инструкции.",
+          questions: [
+            "В наличии график уборки, он соблюдается.",
+            "Имеется схема рабочего места, объекты рабочего места соответствуют схеме.",
+            "На рабочем месте имеется стандарт рабочего места, он актуален и соблюдается.",
+            "В наличии инструкции по обращению с техникой или средствами уборки.",
+            "В наличии таблички по пожарной безопасности и план эвакуации."
+          ]
+        },
+        {
+          key: "improve",
+          title: "5С · Совершенствование",
+          short: "5С",
+          description: "Проверяем регулярность аудита, информирование и улучшения.",
+          questions: [
+            "Проводится аудит 5С согласно графику.",
+            "Результаты аудита доводятся до руководителя.",
+            "В наличии памятки по бережливому производству или агитационные плакаты.",
+            "По результатам предыдущего аудита разработан план мероприятий, ведётся контроль устранения замечаний.",
+            "Размещены примеры было-стало."
+          ]
+        }
+      ],
+      "Транспорт": [
+        {
+          key: "sort",
+          title: "1С · Сортировка",
+          short: "1С",
+          description: "Проверяем кабину, СИЗ, документацию и доступ к транспорту.",
+          questions: [
+            "В кабине автомобиля отсутствуют ненужные, неисправные предметы.",
+            "В шкафчике СИЗ отсутствуют посторонние предметы.",
+            "Определена зона красных ярлыков, имеется журнал, в журнале нет записей без решения позднее 1 месяца.",
+            "Доступ к транспортному средству не затруднён, оно оставлено в специально выделенном месте.",
+            "Отсутствует неактуальная документация в транспортном средстве."
+          ]
+        },
+        {
+          key: "order",
+          title: "2С · Соблюдение порядка",
+          short: "2С",
+          description: "Проверяем хранение, место стоянки, проходы и пожарные посты.",
+          questions: [
+            "Все предметы, находящиеся в транспорте, лежат на своих местах.",
+            "Определены, визуализированы и соблюдаются места хранения СИЗ и средств пожарной безопасности.",
+            "Водитель оставляет транспортное средство в специально выделенном месте, не превышает скоростной режим.",
+            "Автомобиль не загромождает проходы и проезды.",
+            "Проходы к пожарным постам и эвакуационным выходам не загромождены."
+          ]
+        },
+        {
+          key: "clean",
+          title: "3С · Содержание в чистоте",
+          short: "3С",
+          description: "Осматриваем чистоту автомобиля и исправность приборов.",
+          questions: [
+            "Автомобиль поддерживается в чистоте.",
+            "Соблюдается график ТО.",
+            "Отсутствует грязь внутри салона.",
+            "Контрольно-измерительные приборы исправны.",
+            "Отсутствует грязь и следы ржавчины снаружи автомобиля."
+          ]
+        },
+        {
+          key: "standard",
+          title: "4С · Стандартизация",
+          short: "4С",
+          description: "Проверяем уборку, хранение документов, расходников и перевозимого товара.",
+          questions: [
+            "Проводится ежедневная уборка внутри салона.",
+            "Выделено место для хранения документации.",
+            "Выделено место для хранения расходников.",
+            "Выделено место для размещения перевозимого товара.",
+            "В наличии есть путевой лист, права и документы на автомобиль."
+          ]
+        },
+        {
+          key: "improve",
+          title: "5С · Совершенствование",
+          short: "5С",
+          description: "Проверяем обучение, улучшения, контроль 5С и информирование руководителя.",
+          questions: [
+            "Сотрудники прошли обучение по ОТ, ООС, БДД.",
+            "Работники участка предлагают и внедряют мероприятия по совершенствованию рабочих мест.",
+            "Организована система еженедельного контроля поддержания системы 5С, результаты размещены на участке.",
+            "По результатам предыдущего аудита разработан план мероприятий, ведётся контроль устранения замечаний.",
+            "Сотрудники информируют руководителя обо всех нештатных ситуациях."
+          ]
+        }
+      ]
+    };
+    CHECKLISTS.default = CHECKLISTS["Производство и склад"];
+    const S5 = CHECKLISTS.default;
 
     const icons = {
       shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s7-3.4 7-10V5l-7-3-7 3v6c0 6.6 7 10 7 10Z"/><path d="m9 12 2 2 4-4"/></svg>',
@@ -934,10 +1139,10 @@
       return result;
     }
 
-    function fullAnswers(score) {
+    function fullAnswers(score, sections = S5) {
       const answers = {};
       let remaining = 50 - score;
-      S5.forEach(section => section.questions.forEach((_, index) => {
+      sections.forEach(section => section.questions.forEach((_, index) => {
         const key = `${section.key}-${index}`;
         const deduction = remaining > 0 ? Math.min(remaining, remaining > 2 ? 1 : remaining) : 0;
         const value = 2 - deduction;
@@ -1069,7 +1274,7 @@
       const local = seed.users.find(item => item.id === row.id) || {};
       return {
         id: row.id,
-        bitrixId: row.bitrix_id ? String(row.bitrix_id) : "",
+        bitrixId: row.bitrix_id ? String(row.bitrix_id) : (local.bitrixId || ""),
         code: local.code || "",
         name: row.full_name,
         dept: row.department || "",
@@ -1294,6 +1499,15 @@
     }
     function roleName(role) { return ({ auditor: "Линейный аудитор", chief: "Главный аудитор", admin: "Администратор" })[role]; }
     function typeIcon(type) { return type === "Офис" || type === "Прочие помещения" ? icons.building : type === "Транспорт" ? icons.truck : icons.factory; }
+    function checklistSections(type) {
+      return CHECKLISTS[type] || CHECKLISTS.default;
+    }
+    function checklistForTask(t) {
+      return checklistSections(t?.type);
+    }
+    function checklistQuestionCount(sections) {
+      return sections.reduce((sum, section) => sum + section.questions.length, 0);
+    }
     function statusInfo(status) {
       return ({
         todo: ["todo", "Запланировано"],
@@ -1607,7 +1821,10 @@
       const t = task(auditTaskId);
       if (!t) { view = "tasks"; return renderTasks(); }
       if (quickAuditPrompt && isDirectAudit(t)) return renderQuickSapronovAudit(t);
-      const section = S5[auditStep];
+      const sections = checklistForTask(t);
+      const totalQuestions = checklistQuestionCount(sections);
+      if (auditStep >= sections.length) auditStep = sections.length - 1;
+      const section = sections[auditStep];
       const score = taskScore(t);
       const answered = Object.keys(t.answers || {}).length;
       const missingNotes = hasMissingNotes(t);
@@ -1625,7 +1842,7 @@
               </div>
               ${t.status === "returned" ? `<div class="return-note"><b>Комментарий главного аудитора:</b><br>${esc(t.returnComment)}</div>` : ""}
             </div>
-            <div class="step-strip">${S5.map((s, i) => `<button class="step-tab ${i === auditStep ? "active" : ""} ${sectionDone(t, s) ? "done" : ""}" onclick="setAuditStep(${i})">${s.short}</button>`).join("")}</div>
+            <div class="step-strip">${sections.map((s, i) => `<button class="step-tab ${i === auditStep ? "active" : ""} ${sectionDone(t, s) ? "done" : ""}" onclick="setAuditStep(${i})">${s.short}</button>`).join("")}</div>
             <div class="panel">
               <div class="panel-head"><div><h3>${section.title}</h3><p>${section.description}</p></div><button class="ghost-btn" onclick="fillSectionWithTwo('${t.id}','${section.key}')">${icons.check} Поставить 2 по всему разделу</button></div>
               ${section.questions.map((q, index) => renderQuestion(t, section, q, index)).join("")}
@@ -1633,7 +1850,7 @@
                 <button class="ghost-btn" onclick="saveDraft()">${icons.clipboard} Сохранить черновик</button>
                 <div>
                   ${auditStep > 0 ? `<button class="ghost-btn" onclick="setAuditStep(${auditStep - 1})">Назад</button>` : ""}
-                  ${auditStep < 4 ? `<button class="primary-btn" onclick="setAuditStep(${auditStep + 1})">Далее ${icons.arrow}</button>` : `<button class="primary-btn" onclick="submitAudit()" ${answered < 25 || missingNotes ? "disabled" : ""}>${isDirectAudit(t) && issueList(t).length ? "Завершить и создать задачу" : "Завершить аудит"} ${icons.check}</button>`}
+                  ${auditStep < sections.length - 1 ? `<button class="primary-btn" onclick="setAuditStep(${auditStep + 1})">Далее ${icons.arrow}</button>` : `<button class="primary-btn" onclick="submitAudit()" ${answered < totalQuestions || missingNotes ? "disabled" : ""}>${isDirectAudit(t) && issueList(t).length ? "Завершить аудит" : "Завершить аудит"} ${icons.check}</button>`}
                 </div>
               </div>
             </div>
@@ -1641,8 +1858,8 @@
           <aside>
             <div class="side-note">
               <h4>Прогресс проверки</h4>
-              <div class="progress-track"><div class="progress-fill" style="width:${answered / 25 * 100}%"></div></div>
-              <div class="progress-caption"><span>Заполнено</span><b>${answered} / 25</b></div>
+              <div class="progress-track"><div class="progress-fill" style="width:${answered / totalQuestions * 100}%"></div></div>
+              <div class="progress-caption"><span>Заполнено</span><b>${answered} / ${totalQuestions}</b></div>
             </div>
             <div class="side-note">
               <h4>Как оценивать</h4>
@@ -1697,10 +1914,11 @@
       return Object.values(t.answers || {}).some(x => (x.score === 0 || x.score === 1) && !String(x.note || "").trim());
     }
     function issueList(t) {
+      const sections = checklistForTask(t);
       return Object.entries(t.answers || {}).flatMap(([key, answer]) => {
         if (answer.score !== 0 && answer.score !== 1) return [];
         const [sectionKey, rawIndex] = key.split("-");
-        const section = S5.find(item => item.key === sectionKey);
+        const section = sections.find(item => item.key === sectionKey);
         const question = section?.questions[Number(rawIndex)] || key;
         return [{ question, score: answer.score, note: answer.note || "Без пояснения" }];
       });
@@ -2078,7 +2296,7 @@
     function setAuditStep(index) { auditStep = index; render(); window.scrollTo(0, 0); }
     function fillSectionWithTwo(id, sectionKey) {
       const t = task(id);
-      const section = S5.find(item => item.key === sectionKey);
+      const section = checklistForTask(t).find(item => item.key === sectionKey);
       if (!t || !section) return;
       t.answers ||= {};
       section.questions.forEach((_, index) => {
@@ -2171,7 +2389,8 @@
     }
     async function submitAudit() {
       const t = task(auditTaskId);
-      if (Object.keys(t.answers || {}).length < 25) return toast("Заполните все 25 вопросов");
+      const totalQuestions = checklistQuestionCount(checklistForTask(t));
+      if (Object.keys(t.answers || {}).length < totalQuestions) return toast(`Заполните все ${totalQuestions} вопросов`);
       if (hasMissingNotes(t)) return toast("Добавьте комментарии к оценкам 0 и 1");
       if (isDirectAudit(t)) return submitSapronovAudit(t);
       t.status = "accepted";
@@ -2199,6 +2418,18 @@
         render();
         return;
       }
+      if (!confirm("По аудиту есть замечания. Создать задачу в Битрикс24 ответственному за помещение?")) {
+        t.status = "accepted";
+        t.acceptedBy = session.id;
+        t.acceptedAt = new Date().toISOString();
+        t.returnComment = "Аудит завершён с замечаниями. Задача в Битрикс24 не создавалась.";
+        persist();
+        try { await persistSharedTask(t); } catch (error) { return toast(`Общая база: ${error.message}`); }
+        toast("Аудит завершён без создания задачи");
+        view = t.auditKind === "control" ? "control" : "tasks";
+        render();
+        return;
+      }
       if (!t.responsibleBitrixId) return toast("Для помещения ещё не сопоставлен ответственный в Битрикс24");
       toast("Создаём задачу ответственному в Битрикс24...");
       try {
@@ -2206,7 +2437,7 @@
           comment: "Устранить замечания, выявленные во время аудита 5С.",
           issues,
           photos: (t.files || []).filter(photo => photo.base64),
-          chief: session
+          chief: user(session.id) || session
         });
         t.status = "actioned";
         t.returnComment = `Задача создана автоматически по результатам контрольного обхода: ${session.name}.`;
@@ -2223,7 +2454,7 @@
     async function completeAuditWithoutIssues(id) {
       const t = task(id);
       if (!t || !isDirectAudit(t)) return;
-      t.answers = fullAnswers(50);
+      t.answers = fullAnswers(50, checklistForTask(t));
       t.score = 50;
       t.status = "accepted";
       t.acceptedBy = session.id;
@@ -2266,7 +2497,12 @@
       document.getElementById("returnText").focus();
     }
     function closeModal() { document.getElementById("returnModal")?.remove(); }
+    function taskChief(t) {
+      return user(t.ownerChief) || (session?.role === "chief" ? user(session.id) : null) || user(session?.id) || session || {};
+    }
     async function createBitrixTask(t, { comment, issues, photos, chief }) {
+      const taskAuthor = chief?.bitrixId ? chief : taskChief(t);
+      if (!taskAuthor?.bitrixId) throw new Error("Для постановщика задачи не указан ID Битрикс24");
       const payload = {
         roomId: t.sourceRoomId,
         room: t.room,
@@ -2276,8 +2512,8 @@
         photos,
         responsibleBitrixId: t.responsibleBitrixId,
         responsibleName: t.responsibleName || user(t.auditorId).name,
-        chiefBitrixId: chief.bitrixId,
-        chiefName: chief.name
+        chiefBitrixId: taskAuthor.bitrixId,
+        chiefName: taskAuthor.name
       };
       if (supabaseSession?.access_token) return callSharedFunction("bitrix-task", payload);
       const response = await fetch("/api/bitrix/tasks", {
